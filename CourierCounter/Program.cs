@@ -11,6 +11,14 @@ using CourierCounter.Models.ApiModels.Validator;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                         .AllowAnyMethod()
+                         .AllowAnyHeader());
+});
+
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<RegistrationViewModel>, RegistrationValidator>();
 
@@ -19,7 +27,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IWorkerServices, WorkerServices>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
 
-builder.WebHost.UseUrls("http://192.168.102.115:5183");
+builder.WebHost.UseUrls("http://192.168.102.108:5183");
 
 //inject ApplicationDbContext here after making ConnectionStrings in appsettings.json file
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -39,6 +47,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

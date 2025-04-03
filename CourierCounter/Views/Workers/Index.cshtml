@@ -1,0 +1,64 @@
+﻿@using CourierCounter.Models;
+@using CourierCounter.Models.Enum;
+@model WorkerViewModel
+
+@{
+    Layout = "_AdminLayout";
+}
+
+<h2>List of Workers</h2>
+
+<div class="col-md-3 float-end">
+    <select id="filterDropdown" class="form-select">
+        <option value="" selected="@(Model.Status == null ? "selected" : null)">All</option>
+        <option value="Pending" selected="@(Model.Status == StatusEnum.Pending ? "selected" : null)">Pending</option>
+        <option value="Approved" selected="@(Model.Status == StatusEnum.Approved ? "selected" : null)">Approved</option>
+        <option value="Rejected" selected="@(Model.Status == StatusEnum.Rejected ? "selected" : null)">Rejected</option>
+    </select>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">S.N.</th>
+            <th scope="col">FullName</th>
+            <th scope="col">Email</th>
+            <th scope="col">Contact Number</th>
+            <th scope="col">Home Address</th>
+            <th scope="col">Vehicle Number</th>
+            <th scope="col">License Number</th>
+            <th scope="col">National ID</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var worker in Model.WorkerList)
+            {
+                <tr class="clickable-row" data-url="/Workers/Details/@worker.Id">
+                    <th scope="row">@worker.Id</th>
+                    <td>@worker.FullName</td>
+                    <td>@worker.Email</td>
+                    <td>@worker.ContactNumber</td>
+                    <td>@worker.HomeAddress</td>
+                    <td>@worker.VehicleRegistrationNumber</td>
+                    <td>@worker.LicenseNumber</td>
+                    <td>@worker.NationalIdNumber</td>
+                    <td>@worker.Status</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<script>
+    $("#filterDropdown").on("change", function (e) {
+        let url = "/workers?status=" + e.currentTarget.value;
+        window.location.href = url;
+    });
+
+    $("clickable-row").on("click", function(e){
+
+    });
+</script>

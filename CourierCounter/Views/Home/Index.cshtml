@@ -1,7 +1,66 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to Courier Counter</h1>
+<!-- Dashboard Header -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+</div>
+
+<!-- Dashboard Cards -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-header">Website Analytics</div>
+            <div class="card-body">
+                <h5 class="card-title">Conversion Rate: 28.5%</h5>
+                <p>Spending: 12h | Orders: 127 | Items: 2.3k</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-header">Average Daily Sales</div>
+            <div class="card-body">
+                <h5 class="card-title">$28,450</h5>
+                <p>Total sales this month</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-header">Earning Reports</div>
+            <div class="card-body">
+                <h5 class="card-title">$468</h5>
+                <p>Weekly Earnings Overview</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Support Tracker -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Support Tracker</div>
+            <div class="card-body">
+                <p>Total Tickets: 164</p>
+                <p>New Tickets: 142 | Open: 28</p>
+                <p>Response Time: 1 Day</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Sales Overview</div>
+            <div class="card-body">
+                <h5 class="card-title">$42.5k</h5>
+                <p>Orders: 62.2% | Visits: 25.5%</p>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,4 +1,6 @@
-﻿namespace CourierCounter.Models.ApiModels
+﻿using CourierCounter.Models.Enum;
+
+namespace CourierCounter.Models.ApiModels
 {
     public class RegistrationViewModel
     {
@@ -12,6 +14,5 @@
         public required string VehicleRegistrationNumber { get; set; }
         public required string LicenseNumber { get; set; }
         public required string NationalIdNumber { get; set; }
-
     }
 }

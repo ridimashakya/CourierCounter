@@ -1,4 +1,6 @@
-﻿namespace CourierCounter.Models.Entities
+﻿using CourierCounter.Models.Enum;
+
+namespace CourierCounter.Models.Entities
 {
     public class Workers
     {
@@ -12,5 +14,6 @@
         public required string VehicleRegistrationNumber { get; set; }
         public required string LicenseNumber { get; set; }
         public required string NationalIdNumber { get; set; }
+        public StatusEnum Status { get; set; }
     }
 }

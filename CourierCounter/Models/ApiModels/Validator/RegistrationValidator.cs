@@ -21,6 +21,10 @@ namespace CourierCounter.Models.ApiModels.Validator
                 .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter")
                 .Matches(@"\d").WithMessage("Password must contain at least one number")
                 .Matches(@"[@$!%*?&]").WithMessage("Password must contain at least one special character");
+            
+            RuleFor(x => x.ContactNumber)
+                .NotEmpty().WithMessage("Contact Number is required")
+                .Matches(@"^\d{10}$").WithMessage("Contact Number must be exactly 10 digits long");
         }
     }
 }

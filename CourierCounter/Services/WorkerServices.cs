@@ -1,12 +1,16 @@
-﻿using CourierCounter.Data;
+﻿using Azure;
+using Azure.Core;
+using CourierCounter.Data;
 using CourierCounter.Models;
 using CourierCounter.Models.ApiModels;
 using CourierCounter.Models.ApiModels.ApiResponse;
 using CourierCounter.Models.Entities;
+using CourierCounter.Models.Enum;
 using CourierCounter.Services.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.Threading.Tasks;
 
 namespace CourierCounter.Services
@@ -28,6 +32,7 @@ namespace CourierCounter.Services
 
             try
             {
+                //add user to identity table
                 ApplicationUser user = new ApplicationUser
                 {
                     Email = data.Email,
@@ -51,7 +56,8 @@ namespace CourierCounter.Services
                         HomeAddress = data.HomeAddress,
                         VehicleRegistrationNumber = data.VehicleRegistrationNumber,
                         LicenseNumber = data.LicenseNumber,
-                        NationalIdNumber = data.NationalIdNumber
+                        NationalIdNumber = data.NationalIdNumber,
+                        Status = Models.Enum.StatusEnum.Pending
                     };
 
                     _dbContext.AllWorkers.Add(workerEntity);
@@ -63,6 +69,109 @@ namespace CourierCounter.Services
             catch (Exception ex)
             {
                 result = new ApiResponse<bool>(false, "Registration Failed!");
+            }
+
+            return result;
+        }
+        public List<Worker> GetAllWorker(StatusEnum? status = null)
+        {
+            List<Worker> workers = new List<Worker>();
+            try
+            {
+                if (status == null)
+                {
+                    workers = (from worker in _dbContext.AllWorkers
+                               select new Worker
+                               {
+                                   Id = worker.Id,
+                                   FullName = worker.FullName,
+                                   Email = worker.Email,
+                                   ContactNumber = worker.ContactNumber,
+                                   HomeAddress = worker.HomeAddress,
+                                   LicenseNumber = worker.LicenseNumber,
+                                   NationalIdNumber = worker.NationalIdNumber,
+                                   VehicleRegistrationNumber = worker.VehicleRegistrationNumber,
+                                   Status = worker.Status
+                               }).ToList();
+                }
+                else
+                {
+                    workers = (from worker in _dbContext.AllWorkers
+                               where worker.Status == status
+                               select new Worker
+                               {
+                                   Id = worker.Id,
+                                   FullName = worker.FullName,
+                                   Email = worker.Email,
+                                   ContactNumber = worker.ContactNumber,
+                                   HomeAddress = worker.HomeAddress,
+                                   LicenseNumber = worker.LicenseNumber,
+                                   NationalIdNumber = worker.NationalIdNumber,
+                                   VehicleRegistrationNumber = worker.VehicleRegistrationNumber,
+                                   Status = worker.Status
+                               }).ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //log exception
+            }
+
+
+            return workers;
+        }
+
+        public Worker GetWorkerById(int id)
+        {
+            Worker? workerValues = new Worker();
+
+            try
+            {
+                workerValues = (from worker in _dbContext.AllWorkers
+                                where worker.Id == id
+                                select new Worker
+                                {
+                                    Id = worker.Id,
+                                    FullName = worker.FullName,
+                                    Email = worker.Email,
+                                    ContactNumber = worker.ContactNumber,
+                                    HomeAddress = worker.HomeAddress,
+                                    LicenseNumber = worker.LicenseNumber,
+                                    NationalIdNumber = worker.NationalIdNumber,
+                                    VehicleRegistrationNumber = worker.VehicleRegistrationNumber,
+                                    Status = worker.Status
+                                }).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                //log exception
+            }
+
+            return workerValues;
+        }
+
+        public bool UpdateStatusById(int id, StatusEnum status)
+        {
+            bool result = false;
+
+            try
+            {
+                var worker = _dbContext.AllWorkers.Find(id);
+
+                if (worker == null)
+                    return false;
+
+                worker.Status = status;
+
+                _dbContext.AllWorkers.Update(worker);
+                _dbContext.SaveChanges();
+
+                result = true;
+            }
+            catch (Exception)
+            {
+
             }
 
             return result;
