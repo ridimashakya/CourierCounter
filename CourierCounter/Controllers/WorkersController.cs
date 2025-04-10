@@ -43,12 +43,10 @@ namespace CourierCounter.Controllers
             return Redirect("details/" + id);
         }
 
-        //[Route("filterqueryworkers")]
-        //public List<WorkerViewModel> GetFilteredWorkerByStatus([FromQuery] StatusEnum? status = null)
-        //{
-        //    List<WorkerViewModel> workers = _workerServices.GetAllWorker(status);
-        //    return workers;
-        //}
-
+        [Route("worker/delete/{id}")]
+        public bool DeleteWorker(int id)
+        {
+            return _workerServices.DeleteWorker(id);
+        }
     }
 }

@@ -14,6 +14,8 @@ namespace CourierCounter.Data
         
         //property
         //the Workers here is the entity we create for workers
+
         public DbSet<Workers> AllWorkers { get; set; }
+        public DbSet<Orders> Orders { get; set; }
     }
 }

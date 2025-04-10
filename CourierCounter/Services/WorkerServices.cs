@@ -33,6 +33,7 @@ namespace CourierCounter.Services
             try
             {
                 //add user to identity table
+                //ApplicationUser is an entity
                 ApplicationUser user = new ApplicationUser
                 {
                     Email = data.Email,
@@ -73,6 +74,7 @@ namespace CourierCounter.Services
 
             return result;
         }
+
         public List<Worker> GetAllWorker(StatusEnum? status = null)
         {
             List<Worker> workers = new List<Worker>();
@@ -173,7 +175,6 @@ namespace CourierCounter.Services
             {
 
             }
-
             return result;
         }
 
@@ -204,6 +205,26 @@ namespace CourierCounter.Services
                 result = new ApiResponse<bool>(false, "Update Failed!");
             }
             return result;
+        }
+
+        public bool DeleteWorker(int id)
+        {
+            try
+            {
+                var worker = _dbContext.AllWorkers.Find(id);
+
+                if (worker == null)
+                    return false;
+
+                _dbContext.AllWorkers.Remove(worker);
+                _dbContext.SaveChanges();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

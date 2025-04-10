@@ -36,7 +36,8 @@
         @{
             foreach (var worker in Model.WorkerList)
             {
-                <tr class="clickable-row" data-url="/Workers/Details/@worker.Id">
+
+                <tr class="clickable-row" data-url="/Worker/Details/@worker.Id">
                     <th scope="row">@worker.Id</th>
                     <td>@worker.FullName</td>
                     <td>@worker.Email</td>
@@ -46,6 +47,14 @@
                     <td>@worker.LicenseNumber</td>
                     <td>@worker.NationalIdNumber</td>
                     <td>@worker.Status</td>
+                    <td class="text-center align-middle">
+                        <a href="/Worker/Details/@worker.Id" class="text-dark me-2" style="text-decoration: none !important">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a class="text-dark delete-worker" id="worker" data-id="@worker.Id">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </td>
                 </tr>
             }
         }
@@ -58,7 +67,34 @@
         window.location.href = url;
     });
 
-    $("clickable-row").on("click", function(e){
+    $(".clickable-row").on("click", function(e){
+        var url = $(this).data("url");
+        if(url)
+            window.location.href = url;
+    });
 
+    $(".delete-worker").on("click", function (e){
+        e.stopPropagation();
+        var workerId = $(this).data("id");
+
+        if(confirm("Are you sure you want to delete this worker?")){
+            $.ajax({
+                url: '/worker/delete/' + workerId,
+                type: 'DELETE',
+                data: {id: workerId},
+                success: function (response) {
+                    if(response){
+                        alert("Worker deleted successfully.");
+                        window.location.reload();
+                    }
+                    else{
+                        alert("Failed to delete worker.");
+                    }
+                },
+                error: function(){
+                    alert("An error occured while delteing the worker.");
+                }
+            });
+        }
     });
 </script>
