@@ -26,9 +26,9 @@ builder.Services.AddScoped<IValidator<RegistrationViewModel>, RegistrationValida
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IWorkerServices, WorkerServices>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
-//builder.Services.AddScoped<IOrderServices, OrderServices>();
+builder.Services.AddScoped<IOrderServices, OrderServices>();
 
-builder.WebHost.UseUrls("http://192.168.102.59:5183");
+builder.WebHost.UseUrls("http://192.168.102.101:5183");
 
 //inject ApplicationDbContext here after making ConnectionStrings in appsettings.json file
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

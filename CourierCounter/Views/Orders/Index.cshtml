@@ -1,0 +1,60 @@
+﻿@using CourierCounter.Models;
+@using CourierCounter.Models.Enum;
+
+@model List<OrdersViewModel>
+
+@{
+    Layout = "_AdminLayout";
+}
+
+<br />
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mt-2 mb-0">List of Orders</h2>
+    <a href="/Orders/AddOrder" class="btn btn-primary">
+        + Add Order
+    </a>
+</div>
+
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">S.N.</th>
+            <th scope="col">Tracking ID</th>
+            <th scope="col">Customer Name</th>
+            <th scope="col">Customer Email</th>
+            <th scope="col">Customer Contact Number</th>
+            <th scope="col">Home Address</th>
+            <th scope="col">Delivery Zone</th>
+            <th scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            try
+            {
+                foreach (var order in Model)
+                {
+                    <tr>
+                        <th scope="row">@order.Id</th>
+                        <td>@order.TrackingId</td>
+                        <td>@order.CustomerName</td>
+                        <td>@order.CustomerEmail</td>
+                        <td>@order.CustomerContactNumber</td>
+                        <td>@order.DeliveryAddress</td>
+                        <td>@order.DeliveryZone</td>
+                        <td>@order.Status</td>
+                    </tr>
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(":::: " + ex.ToString());
+            }
+        }
+    </tbody>
+</table>
+

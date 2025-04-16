@@ -1,0 +1,53 @@
+﻿@using CourierCounter.Models.Enum
+@model OrdersViewModel
+
+@{
+    Layout = "_AdminLayout";
+}
+
+<br />
+<h3>Order Entry</h3>
+<br />
+
+<form asp-action="AddOrder" asp-controller="Orders" method="post" class="row g-3">
+    <h4><u>Customer Information</u></h4>
+
+    <div class="col-md-6">
+        <label asp-for="CustomerName" class="form-label">Customer Name</label>
+        <input asp-for="CustomerName" class="form-control" />
+        <span asp-validation-for="CustomerName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="CustomerEmail" class="form-label">Customer Email</label>
+        <input asp-for="CustomerEmail" class="form-control" />
+        <span asp-validation-for="CustomerEmail" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="CustomerContactNumber" class="form-label">Customer Contact Number</label>
+        <input asp-for="CustomerContactNumber" class="form-control" />
+        <span asp-validation-for="CustomerContactNumber" class="text-danger"></span>
+    </div>
+
+    <br />
+    <h4><u>Parcel Information</u></h4>
+
+    <div class="col-md-6">
+        <label asp-for="DeliveryAddress" class="form-label">Delivery Address</label>
+        <input asp-for="DeliveryAddress" class="form-control" />
+        <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="DeliveryZone" class="form-label">Delivery Zone</label>
+        <select asp-for="DeliveryZone" class="form-select" asp-items="Html.GetEnumSelectList<DeliveryZoneEnum>()">
+            <option value="">Choose...</option>
+        </select>
+        <span asp-validation-for="DeliveryZone" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary confirm-order">Confirm</button>
+    </div>
+</form>

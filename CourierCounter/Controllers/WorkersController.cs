@@ -23,11 +23,6 @@ namespace CourierCounter.Controllers
             return View(workers);
         }
 
-        public IWorkerServices Get_workerServices()
-        {
-            return _workerServices;
-        }
-
         [Route("worker/details/{id}")]
         public IActionResult Details(int id)
         {
