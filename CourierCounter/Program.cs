@@ -8,6 +8,7 @@ using FluentValidation.AspNetCore;
 using FluentValidation;
 using CourierCounter.Models.ApiModels;
 using CourierCounter.Models.ApiModels.Validator;
+using CourierCounter.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<RegistrationViewModel>, RegistrationValidator>();
+builder.Services.AddScoped<IValidator<OrdersViewModel>, OrderValidator>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -28,7 +30,7 @@ builder.Services.AddScoped<IWorkerServices, WorkerServices>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
 builder.Services.AddScoped<IOrderServices, OrderServices>();
 
-builder.WebHost.UseUrls("http://192.168.102.101:5183");
+builder.WebHost.UseUrls("http://192.168.18.217:5183");
 
 //inject ApplicationDbContext here after making ConnectionStrings in appsettings.json file
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

@@ -1,4 +1,5 @@
 ﻿using CourierCounter.Data;
+using CourierCounter.Models;
 using CourierCounter.Models.ApiModels;
 using CourierCounter.Models.ApiModels.ApiResponse;
 using CourierCounter.Models.Entities;
@@ -27,17 +28,21 @@ namespace CourierCounter.Services
             var res = await _signInManager.PasswordSignInAsync(data.Email, data.Password, false, false);
 
             if (!res.Succeeded)
-                return new ApiResponse<bool>(false, "Login Failed!");
+                return new ApiResponse<bool>(false, "Login Failed! Incorrect credentials.");
             else
             {
-                var isApproved = _dbContext.AllWorkers.Where(x => x.Email == data.Email).Select(x => x.Status).FirstOrDefault();
+                var workerStatus = _dbContext.AllWorkers.Where(x => x.Email == data.Email).Select(x => x.Status).FirstOrDefault();
 
-                if (isApproved != StatusEnum.Approved)
+                if (workerStatus != StatusEnum.Approved)
                 {
-                    return new ApiResponse<bool>(false, "Login Failed!");
+                    string message = workerStatus == StatusEnum.Pending
+                                     ? "Login Failed! Your profile is still in the process of verification"
+                                     : "Login Failed! Yor profile has been rejected. Please contact the Admin.";
+                    return new ApiResponse<bool>(false, message);
                 }
 
-                result = new ApiResponse<bool>(true, "Login Successfull!");
+
+                result = new ApiResponse<bool>(true, "Login Successfull! You are now verified worker.");
             }
             return result;
         }

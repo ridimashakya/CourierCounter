@@ -21,16 +21,14 @@ namespace CourierCounter.Controllers.ApiController
         [HttpPost]
         public async Task<IActionResult> RegisterWorker([FromBody] RegistrationViewModel data)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var result = await _workerServices.CreateWorker(data);
             return Ok(result);
         }
 
-        [Route("update")]
-        [HttpPut]
-        public IActionResult UpdateWorker([FromBody] RegistrationViewModel data)
-        {
-            var result = _workerServices.UpdateWorker(data);
-            return Ok(result);
-        }
     }
 }

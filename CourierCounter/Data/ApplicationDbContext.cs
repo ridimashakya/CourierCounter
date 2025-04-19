@@ -9,13 +9,14 @@ namespace CourierCounter.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-          
+
         }
-        
+
         //property
         //the Workers here is the entity we create for workers
 
         public DbSet<Workers> AllWorkers { get; set; }
         public DbSet<Orders> Orders { get; set; }
+        public DbSet<WorkerOrders> WorkerOrder { get; set; }
     }
 }

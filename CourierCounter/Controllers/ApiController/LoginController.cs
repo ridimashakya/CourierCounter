@@ -1,4 +1,5 @@
-﻿using CourierCounter.Models.ApiModels;
+﻿using AspNetCoreGeneratedDocument;
+using CourierCounter.Models.ApiModels;
 using CourierCounter.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,5 @@ namespace CourierCounter.Controllers.ApiController
             var result = await _loginServices.Login(data);
             return Ok(result);
         }
-
     }
 }

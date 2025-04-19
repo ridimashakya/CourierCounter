@@ -1,7 +1,8 @@
 ﻿namespace CourierCounter.Models.Enum
 {
-    public enum OrderStatus
+    public enum OrderStatusEnum
     {
+      
         Pending,
         InProgress,
         Delivered

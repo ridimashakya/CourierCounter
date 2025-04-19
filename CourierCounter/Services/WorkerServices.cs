@@ -30,6 +30,8 @@ namespace CourierCounter.Services
         {
             ApiResponse<bool> result;
 
+            //Database Transaction
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
                 //add user to identity table
@@ -43,13 +45,15 @@ namespace CourierCounter.Services
                 var res = await _userManager.CreateAsync(user, data.Password);
 
                 if (!res.Succeeded)
+                {
                     return new ApiResponse<bool>(false, "Registration Failed!");
-
+                }
                 else
                 {
                     //Mapping for database entity
                     Workers workerEntity = new Workers
                     {
+                        UserId = user.Id,
                         FullName = data.FullName,
                         Email = data.Email,
                         Password = data.Password,
@@ -58,17 +62,21 @@ namespace CourierCounter.Services
                         VehicleRegistrationNumber = data.VehicleRegistrationNumber,
                         LicenseNumber = data.LicenseNumber,
                         NationalIdNumber = data.NationalIdNumber,
-                        Status = Models.Enum.StatusEnum.Pending
+                        Status = StatusEnum.Pending
                     };
 
                     _dbContext.AllWorkers.Add(workerEntity);
-                    _dbContext.SaveChanges();
+                    await _dbContext.SaveChangesAsync();
+
+                    //Commit transaction
+                    await transaction.CommitAsync();
 
                     result = new ApiResponse<bool>(true, "Successfully Registered!");
                 }
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync(); //rollback all changes
                 result = new ApiResponse<bool>(false, "Registration Failed!");
             }
 
@@ -174,35 +182,6 @@ namespace CourierCounter.Services
             catch (Exception)
             {
 
-            }
-            return result;
-        }
-
-        public ApiResponse<bool> UpdateWorker(RegistrationViewModel data)
-        {
-            ApiResponse<bool> result;
-            try
-            {
-                // update to database logic
-
-                //Mapping for database entry
-                Workers workerEntity = new Workers
-                {
-                    FullName = data.FullName,
-                    Email = data.Email,
-                    Password = data.Password,
-                    ContactNumber = data.ContactNumber,
-                    HomeAddress = data.HomeAddress,
-                    VehicleRegistrationNumber = data.VehicleRegistrationNumber,
-                    LicenseNumber = data.LicenseNumber,
-                    NationalIdNumber = data.NationalIdNumber
-                };
-
-                result = new ApiResponse<bool>(true, "Updated Successfully!");
-            }
-            catch (Exception ex)
-            {
-                result = new ApiResponse<bool>(false, "Update Failed!");
             }
             return result;
         }
