@@ -12,10 +12,12 @@ namespace CourierCounter.Services
     public class OrderServices : IOrderServices
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IMLPredictionService _mlPredictionService;
 
-        public OrderServices(ApplicationDbContext dbContext)
+        public OrderServices(ApplicationDbContext dbContext, IMLPredictionService mlPredictionService)
         {
             _dbContext = dbContext;
+            _mlPredictionService = mlPredictionService;
         }
         public async Task<ApiResponse<bool>> CreateOrder(OrdersViewModel data)
         {
@@ -24,6 +26,16 @@ namespace CourierCounter.Services
             {
                 var trackingId = GenerateTrackingId();
 
+                DeliveryOrderDataModel model = new DeliveryOrderDataModel
+                {
+                    Zone = (float)data.DeliveryZone,
+                    DistanceInKm = data.DistanceInKm,
+                    WeightInKg = data.WeightInKg,
+                    UrgencyLevel = (float)data.UrgencyLevel
+                };
+
+                var wage = _mlPredictionService.PredictWage(model);
+
                 Orders orderEntity = new Orders
                 {
                     CustomerName = data.CustomerName,
@@ -31,7 +43,11 @@ namespace CourierCounter.Services
                     CustomerContactNumber = data.CustomerContactNumber,
                     TrackingId = trackingId,
                     DeliveryAddress = data.DeliveryAddress,
-                    DeliveryZone = data.DeliveryZone
+                    DeliveryZone = data.DeliveryZone,
+                    DistanceInKm = data.DistanceInKm,
+                    WeightInKg = data.WeightInKg,
+                    UrgencyLevel = data.UrgencyLevel,
+                    Wage = Convert.ToDecimal(wage)
                 };
 
                 _dbContext.Orders.Add(orderEntity);
@@ -62,7 +78,10 @@ namespace CourierCounter.Services
                                     CustomerContactNumber = order.CustomerContactNumber,
                                     DeliveryAddress = order.DeliveryAddress,
                                     DeliveryZone = order.DeliveryZone,
-                                    Status = order.Status
+                                    Status = order.Status,
+                                    DistanceInKm = order.DistanceInKm,
+                                    WeightInKg = order.WeightInKg,
+                                    UrgencyLevel = order.UrgencyLevel
                                 }).ToListAsync();
             }
             catch (Exception)
@@ -71,6 +90,26 @@ namespace CourierCounter.Services
             }
 
             return orders;
+        }
+
+        public bool DeleteOrder(int id)
+        {
+            try
+            {
+                var order = _dbContext.Orders.Find(id);
+
+                if (order == null)
+                    return false;
+
+                _dbContext.Orders.Remove(order);
+                _dbContext.SaveChanges();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         private string GenerateTrackingId()
@@ -91,7 +130,7 @@ namespace CourierCounter.Services
 
         public async Task<ApiResponse<List<ForOrderViewModel>>> GetPendingSelectedOrders()
         {
-            ApiResponse<List<ForOrderViewModel>> response = null;
+            //ApiResponse<List<ForOrderViewModel>> response = null;
             try
             {
                 var workers = await (from o in _dbContext.Orders
@@ -99,17 +138,20 @@ namespace CourierCounter.Services
                                      select new ForOrderViewModel
                                      {
                                          DeliveryAddress = o.DeliveryAddress,
-                                         TrackingId = o.TrackingId
+                                         TrackingId = o.TrackingId,
+                                         DistanceInKm = o.DistanceInKm,
+                                         WeightInKg = o.WeightInKg,
+                                         UrgencyLevel = o.UrgencyLevel.ToString(),
+                                         Wage = o.Wage
                                      }).ToListAsync();
 
 
-                response = new ApiResponse<List<ForOrderViewModel>>(true, "Pending selected order listing successfull!", workers);
+                return new ApiResponse<List<ForOrderViewModel>>(true, "Pending selected order listing successfull!", workers);
             }
             catch (Exception ex)
             {
-                response = new ApiResponse<List<ForOrderViewModel>>(false, "Pending selected order not listed.");
+                return new ApiResponse<List<ForOrderViewModel>>(false, "Pending selected order not listed.");
             }
-            return response;
         }
 
         public async Task<ApiResponse<List<ForOrderViewModel>>> GetInProgressSelectedOrders(string userId)
@@ -124,7 +166,11 @@ namespace CourierCounter.Services
                                      select new ForOrderViewModel
                                      {
                                          DeliveryAddress = o.DeliveryAddress,
-                                         TrackingId = o.TrackingId
+                                         TrackingId = o.TrackingId,
+                                         DistanceInKm = o.DistanceInKm,
+                                         WeightInKg = o.WeightInKg,
+                                         UrgencyLevel = o.UrgencyLevel.ToString(),
+                                         Wage = o.Wage
                                      }).ToListAsync();
 
                 return new ApiResponse<List<ForOrderViewModel>>(true, "In progress orders listed sucessfully!", workers);
@@ -137,7 +183,7 @@ namespace CourierCounter.Services
 
         public async Task<ApiResponse<List<ForOrderViewModel>>> GetCompletedSelectedOrders(string userId)
         {
-            ApiResponse<List<ForOrderViewModel>> response = null;
+            //ApiResponse<List<ForOrderViewModel>> response = null;
 
             try
             {
@@ -148,16 +194,19 @@ namespace CourierCounter.Services
                                      select new ForOrderViewModel
                                      {
                                          DeliveryAddress = o.DeliveryAddress,
-                                         TrackingId = o.TrackingId
+                                         TrackingId = o.TrackingId,
+                                         DistanceInKm = o.DistanceInKm,
+                                         WeightInKg = o.WeightInKg,
+                                         UrgencyLevel = o.UrgencyLevel.ToString(),
+                                         Wage = o.Wage
                                      }).ToListAsync();
 
-                response = new ApiResponse<List<ForOrderViewModel>>(true, "Completed orders listed sucessfully!", workers);
+                return new ApiResponse<List<ForOrderViewModel>>(true, "Completed orders listed sucessfully!", workers);
             }
             catch (Exception ex)
             {
-                response = new ApiResponse<List<ForOrderViewModel>>(false, "Completed orders not listed.");
+                return new ApiResponse<List<ForOrderViewModel>>(false, "Completed orders not listed.");
             }
-            return response;
         }
 
         public async Task<ApiResponse<bool>> SavedSelectedOrders(WorkerOrdersViewModel data)

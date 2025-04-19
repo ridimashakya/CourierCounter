@@ -10,6 +10,7 @@ namespace CourierCounter.Services.Interfaces
     {
         Task<ApiResponse<bool>> CreateWorker(RegistrationViewModel data);
         Worker GetWorkerById(int id);
+        Task<WorkerDetailsViewModel> GetWorkerByUserId(string userId);
         bool UpdateStatusById(int id, StatusEnum status);
         List<Worker> GetAllWorker(StatusEnum? status = null);
         public bool DeleteWorker(int id);

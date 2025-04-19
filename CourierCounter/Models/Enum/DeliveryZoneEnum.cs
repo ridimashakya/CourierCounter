@@ -2,9 +2,9 @@
 {
     public enum DeliveryZoneEnum
     {
-        Kathmandu,
-        Lalitpur,
-        Bhaktapur,
-        OutsideValley
+        Kathmandu = 1,
+        Lalitpur = 2,
+        Bhaktapur = 3,
+        OutsideValley = 4
     }
 }

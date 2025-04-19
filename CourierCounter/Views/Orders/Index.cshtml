@@ -29,6 +29,8 @@
             <th scope="col">Home Address</th>
             <th scope="col">Delivery Zone</th>
             <th scope="col">Status</th>
+            <th scope="col">Worker</th>
+            <th scope="col">Action</th>
         </tr>
     </thead>
     <tbody>
@@ -46,6 +48,11 @@
                         <td>@order.DeliveryAddress</td>
                         <td>@order.DeliveryZone</td>
                         <td>@order.Status</td>
+                        <td class="text-center align-middle">
+                            <a class="text-dark delete-order" id="order" data-id="@order.Id">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
                     </tr>
                 }
             }
@@ -57,4 +64,31 @@
         }
     </tbody>
 </table>
+
+<script>
+    $(".delete-order").on("click", function (e){
+        e.stopPropagation();
+        var orderId = $(this).data("id");
+
+        if(confirm("Are you sure you want to delete this order?")){
+            $.ajax({
+                url: '/order/delete' + orderId,
+                type: 'DELETE',
+                data: {id: orderId},    
+                success: function (response) {
+                    if(response){
+                        alert("Order deleted successfully.");
+                        window.location.reload();
+                    }
+                    else{
+                        alert("Failed to delete order.");
+                    }
+                },
+                error: function(){
+                    alert("An error occured while delteing the order.");
+                }
+            });
+        }
+    });
+</script>
 

@@ -10,6 +10,7 @@ using CourierCounter.Services.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.Threading.Tasks;
 
@@ -159,6 +160,35 @@ namespace CourierCounter.Services
             }
 
             return workerValues;
+        }
+
+        public async Task<WorkerDetailsViewModel> GetWorkerByUserId(string userId)
+        {
+            var workerDetails = new WorkerDetailsViewModel();
+
+            try
+            {
+                workerDetails = await (from worker in _dbContext.AllWorkers
+                                       where worker.UserId == userId
+                                       select new WorkerDetailsViewModel
+                                       {
+                                           //Id = worker.Id,
+                                           FullName = worker.FullName,
+                                           Email = worker.Email,
+                                           ContactNumber = worker.ContactNumber,
+                                           HomeAddress = worker.HomeAddress,
+                                           LicenseNumber = worker.LicenseNumber,
+                                           NationalIdNumber = worker.NationalIdNumber,
+                                           VehicleRegistrationNumber = worker.VehicleRegistrationNumber
+                                           //Status = worker.Status
+                                       }).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return workerDetails;
         }
 
         public bool UpdateStatusById(int id, StatusEnum status)

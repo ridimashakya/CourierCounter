@@ -8,6 +8,7 @@ using CourierCounter.Services.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Claims;
 
 namespace CourierCounter.Services
 {

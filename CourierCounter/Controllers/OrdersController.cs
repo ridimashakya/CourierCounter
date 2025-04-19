@@ -36,7 +36,11 @@ namespace CourierCounter.Controllers
             return View();
         }
 
-        
+        [Route("order/delete/{id}")]
+        public bool DeleteOrderById(int id)
+        {
+            return _orderServices.DeleteOrder(id);
+        }
     }
 }
 

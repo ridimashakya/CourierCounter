@@ -10,6 +10,7 @@ namespace CourierCounter.Services.Interfaces
     {
         Task<ApiResponse<bool>> CreateOrder(OrdersViewModel data);
         Task<List<OrdersViewModel>> GetAllOrders();
+        bool DeleteOrder(int id);
         Task<ApiResponse<bool>> SavedSelectedOrders(WorkerOrdersViewModel data);
         Task<ApiResponse<List<ForOrderViewModel>>> GetPendingSelectedOrders();
         Task<ApiResponse<List<ForOrderViewModel>>> GetInProgressSelectedOrders(string userId);

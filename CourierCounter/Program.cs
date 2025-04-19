@@ -29,8 +29,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IWorkerServices, WorkerServices>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
 builder.Services.AddScoped<IOrderServices, OrderServices>();
+builder.Services.AddScoped<IMLPredictionService, MLPredictionService>();
 
-builder.WebHost.UseUrls("http://192.168.18.217:5183");
+builder.WebHost.UseUrls("http://192.168.18.27:5183");
 
 //inject ApplicationDbContext here after making ConnectionStrings in appsettings.json file
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -40,6 +41,21 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = Configuration["Jwt:Issuer"],
+            ValidAudience = Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+        };
+    });
 
 var app = builder.Build();
 

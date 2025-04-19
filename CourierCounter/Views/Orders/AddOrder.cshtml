@@ -34,6 +34,27 @@
     <h4><u>Parcel Information</u></h4>
 
     <div class="col-md-6">
+        <label asp-for="DistanceInKm" class="form-label">Distance (km)</label>
+        <input asp-for="DistanceInKm" class="form-control" type="number" step="0.01" />
+        <span asp-validation-for="DistanceInKm" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="WeightInKg" class="form-label">Weight (kg)</label>
+        <input asp-for="WeightInKg" class="form-control" type="number" step="0.01" />
+        <span asp-validation-for="WeightInKg" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="UrgencyLevel" class="form-label">Urgency Level</label>
+        <select asp-for="UrgencyLevel" class="form-select" asp-items="Html.GetEnumSelectList<UrgencyLevelEnum>()">
+            <option value="">Choose...</option>
+        </select>
+        <span asp-validation-for="UrgencyLevel" class="text-danger"></span>
+    </div>
+
+
+    <div class="col-md-6">
         <label asp-for="DeliveryAddress" class="form-label">Delivery Address</label>
         <input asp-for="DeliveryAddress" class="form-control" />
         <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
