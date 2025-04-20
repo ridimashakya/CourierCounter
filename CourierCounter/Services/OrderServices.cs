@@ -92,36 +92,6 @@ namespace CourierCounter.Services
             return orders;
         }
 
-        public OrdersViewModel? GetOrderById(int id)
-        {
-            try
-            {
-               var orderValues = (from order in _dbContext.Orders
-                               where order.Id == id
-                               select new OrdersViewModel
-                               {
-                                   Id = order.Id,
-                                   TrackingId = order.TrackingId,
-                                   CustomerName = order.CustomerName,
-                                   CustomerEmail = order.CustomerEmail,
-                                   CustomerContactNumber = order.CustomerContactNumber,
-                                   DeliveryAddress = order.DeliveryAddress,
-                                   DeliveryZone = order.DeliveryZone,
-                                   DistanceInKm = order.DistanceInKm,
-                                   WeightInKg = order.WeightInKg,
-                                   UrgencyLevel = order.UrgencyLevel,
-                                   Wage = order.Wage,
-                                   Status = order.Status
-                               }).FirstOrDefault();
-                return orderValues;
-            }
-            catch (Exception ex)
-            {
-                //return null;
-            }
-            return null;
-        }
-
         public bool DeleteOrder(int id)
         {
             try
@@ -136,9 +106,9 @@ namespace CourierCounter.Services
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                return false;
             }
         }
 
@@ -245,38 +215,35 @@ namespace CourierCounter.Services
 
             var createDate = DateTime.Now;
 
-            var orders = await _dbContext.Orders.Where(x => data.OrderId.Contains(x.Id)).ToListAsync();
-            if (orders.Count != data.OrderId.Count)
+            var order = await _dbContext.Orders.Where(x => x.Id == data.OrderId).FirstOrDefaultAsync();
+            if (order == null)
             {
-                result = new ApiResponse<bool>(false, "Some orders do not exist");
+                result = new ApiResponse<bool>(false, "Order doesn't exist");
                 return result;
             }
 
+            order.Status = OrderStatusEnum.InProgress;
+            _dbContext.Orders.Update(order);
+
             try
             {
-                foreach (var order in orders)
-                {
-                    order.Status = OrderStatusEnum.InProgress;
-                }
-                _dbContext.Orders.UpdateRange(orders);
-
-                var workerOrdersList = data.OrderId.Select(orderId => new WorkerOrders
+                WorkerOrders workerOrders = new WorkerOrders
                 {
                     WorkerId = data.WorkerId,
-                    OrderId = orderId,
+                    OrderId = data.OrderId,
                     CreatedDate = createDate
-                }).ToList();
+                };
 
-                _dbContext.WorkerOrder.AddRange(workerOrdersList);
+                _dbContext.WorkerOrder.Add(workerOrders);
                 await _dbContext.SaveChangesAsync();
 
-                result = new ApiResponse<bool>(true, "Selected orders saved successfully!");
+                result = new ApiResponse<bool>(true, "Selceted orders saved successfully!");
             }
             catch (Exception)
             {
-
-                result = new ApiResponse<bool>(false, "Error saving the selected orders.");
+                result = new ApiResponse<bool>(false, "Error saving the salected orders.");
             }
+
             return result;
         }
     }

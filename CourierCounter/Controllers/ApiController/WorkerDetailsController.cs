@@ -1,7 +1,6 @@
 ﻿using CourierCounter.Models;
 using CourierCounter.Models.ApiModels;
 using CourierCounter.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -18,13 +17,11 @@ namespace CourierCounter.Controllers.ApiController
             _workerServices = workerServices;
         }
 
-        
-        [Route("getworkerdetails/{userId}")]
+        [Route("getworkerdetails")]
         [HttpGet]
-        public async Task<IActionResult> GetWorkerDetails(string userId)
+        public async Task<IActionResult> GetWorkerDetails()
         {
-            //string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            userId = userId == "null" ? "92c5b40f-8a3f-4f6d-8eb1-d08eb03747f9" : userId;
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
             var result = await _workerServices.GetWorkerByUserId(userId);
             return Ok(result);

@@ -12,11 +12,10 @@ namespace CourierCounter.Models
         public required string DeliveryAddress { get; set; }
         public float DistanceInKm { get; set; }
         public float WeightInKg { get; set; }
-        public decimal Wage { get; set; }
         public UrgencyLevelEnum UrgencyLevel { get; set; }
         public DeliveryZoneEnum DeliveryZone { get; set; }
         public OrderStatusEnum Status { get; set; }
     }
 }
-
+    
 

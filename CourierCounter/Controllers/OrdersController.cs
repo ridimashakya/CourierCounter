@@ -1,7 +1,6 @@
 ﻿using CourierCounter.Models;
 using CourierCounter.Models.ApiModels.ApiResponse;
 using CourierCounter.Models.Entities;
-using CourierCounter.Services;
 using CourierCounter.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,13 +40,6 @@ namespace CourierCounter.Controllers
         public bool DeleteOrderById(int id)
         {
             return _orderServices.DeleteOrder(id);
-        }
-
-        [Route("order/details/{id}")]
-        public IActionResult Details(int id)
-        {
-            OrdersViewModel order = _orderServices.GetOrderById(id);
-            return View(order);
         }
     }
 }
