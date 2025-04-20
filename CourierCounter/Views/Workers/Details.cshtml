@@ -5,6 +5,28 @@
     Layout = "_AdminLayout";
 }
 
+<style>
+    .btn-approve {
+        background-color: #a8d5a2; /* soft green */
+        color: #1e4620;
+        border: none;
+    }
+
+        .btn-approve:hover {
+            background-color: #98cc91;
+        }
+
+    .btn-reject {
+        background-color: #f5b5b5; /* soft red */
+        color: #5c1c1c;
+        border: none;
+    }
+
+        .btn-reject:hover {
+            background-color: #e99c9c;
+        }
+</style>
+
 @* each worker detail page *@
 <ul class="list-group">
     <li class="list-group-item">Id : @Model.Id</li>
@@ -20,14 +42,15 @@
 
 @if (Model.Status == CourierCounter.Models.Enum.StatusEnum.Pending)
 {
-    <li class="list-group-item d-flex justify-content-between align-items-center float-end">
-        <div>
-            <a class="btn btn-success btn-sm approve-btn" href="@("/worker/approvereject?id=" + Model.Id + "&status=Approved")">Approve</a>
-            <a class="btn btn-danger btn-sm reject-btn" href="@("/worker/approvereject?id=" + Model.Id + "&status=Rejected")">Reject</a>
-        </div>
+    <li class="list-group-item d-flex justify-content-end align-items-center">
+        <a class="btn btn-sm me-2 shadow-sm px-3 btn-approve" href="@($"/worker/approvereject?id={Model.Id}&status=Approved")">
+            ✅ Approve
+        </a>
+        <a class="btn btn-sm shadow-sm px-3 btn-reject" href="@($"/worker/approvereject?id={Model.Id}&status=Rejected")">
+            ❌ Reject
+        </a>
     </li>
 }
-
 
 
 

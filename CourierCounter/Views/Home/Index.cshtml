@@ -3,64 +3,82 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+<style>
+    .bg-theme {
+        background-color: #747fb6 !important;
+        color: white;
+    }
+
+    .bg-theme-light {
+        background-color: #a2aad9 !important;
+        color: white;
+    }
+
+    .card .card-header {
+        font-weight: 600;
+    }
+</style>
+
 <!-- Dashboard Header -->
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Dashboard</h1>
+    <h1 class="h2" style="color: #747fb6;">Dashboard</h1>
 </div>
 
 <!-- Dashboard Cards -->
 <div class="row">
     <div class="col-md-4">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-header">Website Analytics</div>
+        <div class="card bg-theme mb-3">
+            <div class="card-header">Today's Deliveries</div>
             <div class="card-body">
-                <h5 class="card-title">Conversion Rate: 28.5%</h5>
-                <p>Spending: 12h | Orders: 127 | Items: 2.3k</p>
+                <h5 class="card-title">58 Deliveries</h5>
+                <p>Completed: 54 | Pending: 4</p>
             </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-header">Average Daily Sales</div>
+        <div class="card bg-theme-light mb-3">
+            <div class="card-header">Earnings Overview</div>
             <div class="card-body">
-                <h5 class="card-title">$28,450</h5>
-                <p>Total sales this month</p>
+                <h5 class="card-title">Rs. 24,500</h5>
+                <p>Revenue generated today</p>
             </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card text-white bg-warning mb-3">
-            <div class="card-header">Earning Reports</div>
+        <div class="card bg-theme mb-3">
+            <div class="card-header">Active Workers</div>
             <div class="card-body">
-                <h5 class="card-title">$468</h5>
-                <p>Weekly Earnings Overview</p>
+                <h5 class="card-title">17 Workers</h5>
+                <p>Online now: 12 | On Delivery: 10</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Support Tracker -->
+<!-- Order & Worker Overview -->
 <div class="row">
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Support Tracker</div>
+        <div class="card border-theme mb-3">
+            <div class="card-header" style="background-color: #f0f2ff;">Order Tracker</div>
             <div class="card-body">
-                <p>Total Tickets: 164</p>
-                <p>New Tickets: 142 | Open: 28</p>
-                <p>Response Time: 1 Day</p>
+                <p>Total Orders Today: 72</p>
+                <p>Assigned: 68 | Unassigned: 4</p>
+                <p>Cancelled: 3 | Returns: 2</p>
             </div>
         </div>
     </div>
 
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Sales Overview</div>
+        <div class="card border-theme mb-3">
+            <div class="card-header" style="background-color: #f0f2ff;">Worker Performance</div>
             <div class="card-body">
-                <h5 class="card-title">$42.5k</h5>
-                <p>Orders: 62.2% | Visits: 25.5%</p>
+                <p>Top Performer: Rakesh Kumar (12 deliveries)</p>
+                <p>Average Delivery Time: 36 mins</p>
+                <p>Issues Reported: 1</p>
             </div>
         </div>
     </div>
 </div>
+

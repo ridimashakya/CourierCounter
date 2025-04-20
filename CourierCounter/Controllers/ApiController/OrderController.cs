@@ -42,21 +42,23 @@ namespace CourierCounter.Controllers.ApiController
             return Ok(result);
         }
 
-        [Route("inprogressorders")]
+        [Route("inprogressorders/{userId}")]
         [HttpGet]
-        public async Task<IActionResult> InProgressOrders()
+        public async Task<IActionResult> InProgressOrders(string userId)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            //string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            userId = userId == "null" ? "92c5b40f-8a3f-4f6d-8eb1-d08eb03747f9" : userId;
 
             var result = await _orderServices.GetInProgressSelectedOrders(userId);
             return Ok(result);
         }
 
-        [Route("deliveredorders")]
+        [Route("deliveredorders/{userId}")]
         [HttpGet]
-        public async Task<IActionResult> DeliveredOrders()
+        public async Task<IActionResult> DeliveredOrders(string userId)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            //string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            userId = userId == "null" ? "92c5b40f-8a3f-4f6d-8eb1-d08eb03747f9" : userId;
 
             var result = await _orderServices.GetCompletedSelectedOrders(userId);
             return Ok(result);
