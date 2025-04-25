@@ -35,7 +35,7 @@ builder.Services.AddScoped<IOrderServices, OrderServices>();
 builder.Services.AddScoped<IMLPredictionService, MLPredictionService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-builder.WebHost.UseUrls("http://192.168.18.27:5183");
+builder.WebHost.UseUrls("http://192.168.102.98:5183");
 
 //inject ApplicationDbContext here after making ConnectionStrings in appsettings.json file
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -45,6 +45,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Admin/Login";
+    //options.AccessDeniedPath = "/Admin/AccessDenied"; 
+});
 
 var configuration = builder.Configuration;
 
@@ -85,6 +91,13 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+
+//Database Seeding
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await DatabaseSeeding.SeedAdminAsync(services);
 }
 
 app.UseCors("AllowAll");

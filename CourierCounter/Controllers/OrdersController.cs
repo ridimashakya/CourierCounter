@@ -24,6 +24,7 @@ namespace CourierCounter.Controllers
             return View(result);
         }
 
+        [HttpGet]
         public IActionResult AddOrder()
         {
             return View();
@@ -32,6 +33,10 @@ namespace CourierCounter.Controllers
         [HttpPost]
         public async Task<IActionResult> AddOrder(OrdersViewModel data)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
             var result = await _orderServices.CreateOrder(data);
             ModelState.Clear();
             return View();

@@ -1,0 +1,105 @@
+﻿@{
+    ViewData["Title"] = "Admin login";
+    Layout = "";
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+<style>
+    body {
+        background-color: #f4f6fa;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .login-wrapper {
+        max-width: 420px;
+       
+        padding: 32px;
+        background-color: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+        .login-wrapper h2 {
+            text-align: center;
+            margin-bottom: 28px;
+            color: #2c3e50;
+        }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border 0.3s ease;
+        }
+
+            .form-group input:focus {
+                border-color: #747fb6;
+                outline: none;
+            }
+
+    .btn-submit {
+        width: 100%;
+        background-color: #747fb6;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-submit:hover {
+            background-color: #5f6ba2;
+        }
+
+    .error-message {
+        color: red;
+        text-align: center;
+        margin-bottom: 16px;
+        font-size: 14px;
+    }
+</style>
+
+<div class="login-wrapper mx-auto my-5" >
+    <div class="text-center mt-2">
+        <a class="d-flex justify-content-center" href="d:\projects\couriercounter\couriercounter\views\admin\index.cshtml">
+            <img src="~/images/ccDeliver.png" alt="Courier Counter" class="img-fluid " style="max-height: 150px; width: 80%; max-width: 200px;" />
+         </a>
+    </div>
+    <h2>Admin Login</h2>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="error-message">Invalid email or password.</div>
+    }
+
+    <form asp-action="Login" asp-controller="Admin" method="post">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" required />
+        </div>
+
+        <button class="btn-submit" type="submit">Login</button>
+    </form> 
+</div>

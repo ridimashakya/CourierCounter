@@ -20,6 +20,10 @@ namespace CourierCounter.Controllers.ApiController
         [HttpPost]
         public async Task<IActionResult> LoginWorker([FromBody] LoginViewModel data)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var result = await _loginServices.Login(data);
             return Ok(result);
         }

@@ -96,6 +96,11 @@ namespace CourierCounter.Services
         {
             try
             {
+                var workerName = (from workerOrder in _dbContext.WorkerOrder
+                                  join worker in _dbContext.AllWorkers on workerOrder.WorkerId equals worker.Id
+                                  where workerOrder.OrderId == id
+                                  select worker.FullName).FirstOrDefault() ?? "N/A"; 
+
                var orderValues = (from order in _dbContext.Orders
                                where order.Id == id
                                select new OrdersViewModel
@@ -111,7 +116,8 @@ namespace CourierCounter.Services
                                    WeightInKg = order.WeightInKg,
                                    UrgencyLevel = order.UrgencyLevel,
                                    Wage = order.Wage,
-                                   Status = order.Status
+                                   Status = order.Status,
+                                   WorkerName = workerName
                                }).FirstOrDefault();
                 return orderValues;
             }

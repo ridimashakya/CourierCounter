@@ -17,7 +17,7 @@ namespace CourierCounter.Models.ApiModels.Validator
 
             RuleFor(order => order.CustomerContactNumber)
                 .NotEmpty().WithMessage("Customer Contact Number is required")
-                .Matches(@"^\d{10}$").WithMessage("CUstomer Contact Number must be exactly 10 digits long");
+                .Matches(@"^\d{10}$").WithMessage("Customer Contact Number must be exactly 10 digits long");
 
             RuleFor(order => order.DeliveryAddress)
                 .NotEmpty().WithMessage("Customer Delivery Address is required");

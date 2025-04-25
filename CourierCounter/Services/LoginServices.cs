@@ -7,6 +7,7 @@ using CourierCounter.Models.Enum;
 using CourierCounter.Services.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 
@@ -26,6 +27,7 @@ namespace CourierCounter.Services
             _userManager = userManager;
             _tokenService = tokenService;
         }
+
         public async Task<ApiResponse<string>> Login(LoginViewModel data)
         {
             ApiResponse<string> result;
@@ -52,6 +54,32 @@ namespace CourierCounter.Services
                 result = new ApiResponse<string>(true, "Login Successfull! You are now verified worker.", user.Id);
             }
             return result;
+        }
+
+        public async Task<bool> AdminLogin(AdminLoginModel data)
+        {
+            var res = await _signInManager.PasswordSignInAsync(data.Email, data.Password, false, false);
+
+            if (!res.Succeeded)
+                return false;
+
+            return true;
+        }
+
+        [HttpPost]
+        public async Task<bool> AdminLogout()
+        {
+            try
+            {
+                await _signInManager.SignOutAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return false;
         }
     }
 }

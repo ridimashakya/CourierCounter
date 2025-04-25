@@ -32,6 +32,7 @@ namespace CourierCounter.Services
 
                 var trainingData = mlContext.Data.LoadFromEnumerable(data);
 
+                //optimization method
                 var pipeline = mlContext.Transforms.Concatenate("Features", "Zone", "DistanceInKm", "WeightInKg", "UrgencyLevel")
            .Append(mlContext.Regression.Trainers.Sdca(labelColumnName: "Label", featureColumnName: "Features"));
 

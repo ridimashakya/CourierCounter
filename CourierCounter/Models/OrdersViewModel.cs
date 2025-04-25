@@ -5,7 +5,7 @@ namespace CourierCounter.Models
     public class OrdersViewModel
     {
         public int Id { get; set; }
-        public required string TrackingId { get; set; }
+        public string? TrackingId { get; set; }
         public required string CustomerName { get; set; }
         public required string CustomerContactNumber { get; set; }
         public required string CustomerEmail { get; set; }
@@ -16,6 +16,7 @@ namespace CourierCounter.Models
         public UrgencyLevelEnum UrgencyLevel { get; set; }
         public DeliveryZoneEnum DeliveryZone { get; set; }
         public OrderStatusEnum Status { get; set; }
+        public string? WorkerName { get; set; }
     }
 }
 

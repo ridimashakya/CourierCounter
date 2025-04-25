@@ -1,5 +1,8 @@
 ﻿@using CourierCounter.Models;
+
+
 @model OrdersViewModel
+
 
 @{
     Layout = "_AdminLayout";
@@ -19,6 +22,8 @@
         <li class="list-group-item">Weight (Kg): @Model.WeightInKg</li>
         <li class="list-group-item">Priority : @Model.UrgencyLevel</li>
         <li class="list-group-item">Status : @Model.Status</li>
+        <br/>
+        <li class="list-group-item">Assigned To : @Model.WorkerName</li>
     </ul>
 
     <!-- Highlighted Wages Section (outside of list) -->
