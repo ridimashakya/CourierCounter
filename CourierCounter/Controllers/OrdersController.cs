@@ -56,6 +56,22 @@ namespace CourierCounter.Controllers
             OrdersViewModel order = _orderServices.GetOrderById(id);
             return View(order);
         }
+
+        [HttpGet]
+        [Route("order/edit/{id}")]
+        public async Task<IActionResult> UpdateOrder(int id)
+        {
+            var result = _orderServices.GetOrderById(id);
+            return View(result);
+        }
+
+        [HttpPost]
+        [Route("order/edit/{id}")]
+        public async Task<IActionResult> UpdateOrder(OrdersViewModel data)
+        {
+            var result = await _orderServices.UpdateOrder(data);
+            return View();
+        }
     }
 }
 

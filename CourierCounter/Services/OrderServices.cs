@@ -6,6 +6,7 @@ using CourierCounter.Data;
 using Microsoft.EntityFrameworkCore;
 using CourierCounter.Models.ApiModels;
 using CourierCounter.Models.Enum;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CourierCounter.Services
 {
@@ -99,26 +100,26 @@ namespace CourierCounter.Services
                 var workerName = (from workerOrder in _dbContext.WorkerOrder
                                   join worker in _dbContext.AllWorkers on workerOrder.WorkerId equals worker.Id
                                   where workerOrder.OrderId == id
-                                  select worker.FullName).FirstOrDefault() ?? "N/A"; 
+                                  select worker.FullName).FirstOrDefault() ?? "N/A";
 
-               var orderValues = (from order in _dbContext.Orders
-                               where order.Id == id
-                               select new OrdersViewModel
-                               {
-                                   Id = order.Id,
-                                   TrackingId = order.TrackingId,
-                                   CustomerName = order.CustomerName,
-                                   CustomerEmail = order.CustomerEmail,
-                                   CustomerContactNumber = order.CustomerContactNumber,
-                                   DeliveryAddress = order.DeliveryAddress,
-                                   DeliveryZone = order.DeliveryZone,
-                                   DistanceInKm = order.DistanceInKm,
-                                   WeightInKg = order.WeightInKg,
-                                   UrgencyLevel = order.UrgencyLevel,
-                                   Wage = order.Wage,
-                                   Status = order.Status,
-                                   WorkerName = workerName
-                               }).FirstOrDefault();
+                var orderValues = (from order in _dbContext.Orders
+                                   where order.Id == id
+                                   select new OrdersViewModel
+                                   {
+                                       Id = order.Id,
+                                       TrackingId = order.TrackingId,
+                                       CustomerName = order.CustomerName,
+                                       CustomerEmail = order.CustomerEmail,
+                                       CustomerContactNumber = order.CustomerContactNumber,
+                                       DeliveryAddress = order.DeliveryAddress,
+                                       DeliveryZone = order.DeliveryZone,
+                                       DistanceInKm = order.DistanceInKm,
+                                       WeightInKg = order.WeightInKg,
+                                       UrgencyLevel = order.UrgencyLevel,
+                                       Wage = order.Wage,
+                                       Status = order.Status,
+                                       WorkerName = workerName
+                                   }).FirstOrDefault();
                 return orderValues;
             }
             catch (Exception ex)
@@ -146,6 +147,102 @@ namespace CourierCounter.Services
             {
                 throw;
             }
+        }
+
+        public async Task<ApiResponse<bool>> UpdateOrder(int id)
+        {
+            ApiResponse<bool> result;
+            try
+            {
+                var existingOrderValue = (from order in _dbContext.Orders
+                                          where order.Id == id
+                                          select new OrdersViewModel
+                                          {
+                                              Id = order.Id,
+                                              TrackingId = order.TrackingId,
+                                              CustomerName = order.CustomerName,
+                                              CustomerEmail = order.CustomerEmail,
+                                              CustomerContactNumber = order.CustomerContactNumber,
+                                              DeliveryAddress = order.DeliveryAddress,
+                                              DeliveryZone = order.DeliveryZone,
+                                              DistanceInKm = order.DistanceInKm,
+                                              WeightInKg = order.WeightInKg,
+                                              UrgencyLevel = order.UrgencyLevel,
+                                              Wage = order.Wage,
+                                              Status = order.Status
+                                          }).FirstOrDefault();
+
+                await _dbContext.SaveChangesAsync();
+                result = new ApiResponse<bool>(true, "Order details listed successfully!");
+            }
+            catch (Exception ex)
+            {
+                result = new ApiResponse<bool>(false, "Order details cannot be listed");
+            }
+            return result;
+        }
+
+
+        //public async Task<ApiResponse<bool>> UpdateOrder(OrdersViewModel data)
+        //{
+        //    ApiResponse<bool> result;
+        //    try
+        //    {
+        //        OrdersViewModel model = new OrdersViewModel
+        //        {
+        //            Id = data.Id,
+        //            TrackingId = data.TrackingId,
+        //            CustomerName = data.CustomerName,
+        //            CustomerEmail = data.CustomerEmail,
+        //            CustomerContactNumber = data.CustomerContactNumber,
+        //            DeliveryAddress = data.DeliveryAddress,
+        //            DistanceInKm = data.DistanceInKm,
+        //            WeightInKg = data.WeightInKg,
+        //            UrgencyLevel = data.UrgencyLevel,
+        //            DeliveryZone = data.DeliveryZone,
+        //            Wage = data.Wage,
+        //            Status = data.Status,
+        //        };
+
+        //        await _dbContext.SaveChangesAsync();
+        //        result = new ApiResponse<bool>(true, "Order updated successfully!");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        result = new ApiResponse<bool>(false, "Order cannot be updated");
+        //    }
+        //    return result;
+        //}
+
+        public async Task<ApiResponse<bool>> UpdateOrder(OrdersViewModel data)
+        {
+            ApiResponse<bool> result;
+
+            try
+            {
+                var order = await _dbContext.Orders.Where(x => x.Id == data.Id).FirstOrDefaultAsync();
+
+                if (order == null)
+                    return new ApiResponse<bool>(false, "Order Updated!");
+
+                order.CustomerName = data.CustomerName;
+                order.CustomerEmail = data.CustomerEmail;
+                order.CustomerContactNumber = data.CustomerContactNumber;
+                order.DeliveryAddress = data.DeliveryAddress;
+                order.DistanceInKm = data.DistanceInKm;
+                order.WeightInKg = data.WeightInKg;
+                order.UrgencyLevel = data.UrgencyLevel;
+                order.DeliveryZone = data.DeliveryZone;
+
+                _dbContext.Orders.Update(order);
+                await _dbContext.SaveChangesAsync();
+                result = new ApiResponse<bool>(true, "Order updated successfully!");
+            }
+            catch (Exception ex)
+            {
+                result = new ApiResponse<bool>(false, "Order cannot be updated");
+            }
+            return result;
         }
 
         private string GenerateTrackingId()
