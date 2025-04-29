@@ -25,7 +25,7 @@ namespace CourierCounter.Controllers
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Login", "Admin");
+                return Redirect("/");
             }
             return View();  
         }

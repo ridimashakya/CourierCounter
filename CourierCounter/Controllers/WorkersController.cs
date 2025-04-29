@@ -1,10 +1,12 @@
 ﻿using CourierCounter.Models;
 using CourierCounter.Models.Enum;
 using CourierCounter.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierCounter.Controllers
 {
+    [Authorize]
     public class WorkersController : Controller
     {
         private readonly IWorkerServices _workerServices;

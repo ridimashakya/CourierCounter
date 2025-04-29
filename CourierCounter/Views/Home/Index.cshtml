@@ -2,6 +2,7 @@
     ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+@model WorkerViewModel
 
 <style>
     .bg-theme {
@@ -30,7 +31,7 @@
         <div class="card bg-theme mb-3">
             <div class="card-header">Today's Deliveries</div>
             <div class="card-body">
-                <h5 class="card-title">58 Deliveries</h5>
+                <h5 class="card-title">50 Deliveries</h5>
                 <p>Completed: 54 | Pending: 4</p>
             </div>
         </div>
@@ -48,9 +49,9 @@
 
     <div class="col-md-4">
         <div class="card bg-theme mb-3">
-            <div class="card-header">Active Workers</div>
+            <div class="card-header">Total Verified Workers</div>
             <div class="card-body">
-                <h5 class="card-title">17 Workers</h5>
+                <h5 class="card-title">50 Workers</h5>
                 <p>Online now: 12 | On Delivery: 10</p>
             </div>
         </div>

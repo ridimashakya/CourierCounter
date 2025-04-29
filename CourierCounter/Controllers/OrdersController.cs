@@ -3,10 +3,12 @@ using CourierCounter.Models.ApiModels.ApiResponse;
 using CourierCounter.Models.Entities;
 using CourierCounter.Services;
 using CourierCounter.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierCounter.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
         private readonly IOrderServices _orderServices;

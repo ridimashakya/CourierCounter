@@ -29,6 +29,5 @@ namespace CourierCounter.Controllers.ApiController
             var result = await _workerServices.CreateWorker(data);
             return Ok(result);
         }
-
     }
 }

@@ -35,7 +35,7 @@ builder.Services.AddScoped<IOrderServices, OrderServices>();
 builder.Services.AddScoped<IMLPredictionService, MLPredictionService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-builder.WebHost.UseUrls("http://192.168.102.98:5183");
+builder.WebHost.UseUrls("http://192.168.102.100:5183");
 
 //inject ApplicationDbContext here after making ConnectionStrings in appsettings.json file
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

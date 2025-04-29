@@ -22,3 +22,4 @@ namespace CourierCounter.Models
         public StatusEnum Status { get; set; }
     }
 }
+
