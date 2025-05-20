@@ -2,22 +2,33 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using CourierCounter.Models;
 using Microsoft.AspNetCore.Authorization;
+using CourierCounter.Services.Interfaces;
 
 namespace CourierCounter.Controllers;
 
 [Authorize]
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
+    private readonly IDashboardService _dashboardService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(IDashboardService dashboardService)
     {
-        _logger = logger;
+        _dashboardService = dashboardService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var orderCountDetails = await _dashboardService.GetOrderDetail();
+        var workerCountDetails = await _dashboardService.GetWorkerDetail();
+
+
+        var model = new DashboardViewModel
+        {
+            OrdersCount = orderCountDetails,
+            WorkersCount = workerCountDetails
+        };
+
+        return View(model);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

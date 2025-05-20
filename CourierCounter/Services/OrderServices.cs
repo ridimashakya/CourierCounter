@@ -182,38 +182,6 @@ namespace CourierCounter.Services
             return result;
         }
 
-
-        //public async Task<ApiResponse<bool>> UpdateOrder(OrdersViewModel data)
-        //{
-        //    ApiResponse<bool> result;
-        //    try
-        //    {
-        //        OrdersViewModel model = new OrdersViewModel
-        //        {
-        //            Id = data.Id,
-        //            TrackingId = data.TrackingId,
-        //            CustomerName = data.CustomerName,
-        //            CustomerEmail = data.CustomerEmail,
-        //            CustomerContactNumber = data.CustomerContactNumber,
-        //            DeliveryAddress = data.DeliveryAddress,
-        //            DistanceInKm = data.DistanceInKm,
-        //            WeightInKg = data.WeightInKg,
-        //            UrgencyLevel = data.UrgencyLevel,
-        //            DeliveryZone = data.DeliveryZone,
-        //            Wage = data.Wage,
-        //            Status = data.Status,
-        //        };
-
-        //        await _dbContext.SaveChangesAsync();
-        //        result = new ApiResponse<bool>(true, "Order updated successfully!");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        result = new ApiResponse<bool>(false, "Order cannot be updated");
-        //    }
-        //    return result;
-        //}
-
         public async Task<ApiResponse<bool>> UpdateOrder(OrdersViewModel data)
         {
             ApiResponse<bool> result;
@@ -234,7 +202,19 @@ namespace CourierCounter.Services
                 order.UrgencyLevel = data.UrgencyLevel;
                 order.DeliveryZone = data.DeliveryZone;
 
+                DeliveryOrderDataModel model = new DeliveryOrderDataModel
+                {
+                    Zone = (float)data.DeliveryZone,
+                    DistanceInKm = data.DistanceInKm,
+                    WeightInKg = data.WeightInKg,
+                    UrgencyLevel = (float)data.UrgencyLevel
+                };
+
+                var wage = _mlPredictionService.PredictWage(model);
+                order.Wage = (decimal)wage;
+
                 _dbContext.Orders.Update(order);
+
                 await _dbContext.SaveChangesAsync();
                 result = new ApiResponse<bool>(true, "Order updated successfully!");
             }

@@ -2,7 +2,7 @@
     ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-@model WorkerViewModel
+@model DashboardViewModel
 
 <style>
     .bg-theme {
@@ -31,55 +31,55 @@
         <div class="card bg-theme mb-3">
             <div class="card-header">Today's Deliveries</div>
             <div class="card-body">
-                <h5 class="card-title">50 Deliveries</h5>
-                <p>Completed: 54 | Pending: 4</p>
+                <h5 class="card-title">@Model.OrdersCount.TotalOrder Deliveries</h5>
+                <p>Completed: @Model.OrdersCount.DeliveredOrderCount | Pending: @Model.OrdersCount.PendingOrderCount | InProgress: @Model.OrdersCount.InProgressOrderCount</p>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card bg-theme-light mb-3">
-            <div class="card-header">Earnings Overview</div>
-            <div class="card-body">
-                <h5 class="card-title">Rs. 24,500</h5>
-                <p>Revenue generated today</p>
-            </div>
-        </div>
-    </div>
+    @* <div class="col-md-4"> *@
+    @*     <div class="card bg-theme-light mb-3"> *@
+    @*         <div class="card-header">Earnings Overview</div> *@
+    @*         <div class="card-body"> *@
+    @*             <h5 class="card-title">Rs. 24,500</h5> *@
+    @*             <p>Revenue generated today</p> *@
+    @*         </div> *@
+    @*     </div> *@
+    @* </div> *@
 
     <div class="col-md-4">
         <div class="card bg-theme mb-3">
-            <div class="card-header">Total Verified Workers</div>
+            <div class="card-header">Total Workers</div>
             <div class="card-body">
-                <h5 class="card-title">50 Workers</h5>
-                <p>Online now: 12 | On Delivery: 10</p>
+                <h5 class="card-title">@Model.WorkersCount.TotalWorker Workers</h5>
+                <p>Pending: @Model.WorkersCount.PendingWorker | Verified: @Model.WorkersCount.ApprovedWorker | Rejected: @Model.WorkersCount.RejectedWorker</p>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Order & Worker Overview -->
-<div class="row">
-    <div class="col-md-6">
-        <div class="card border-theme mb-3">
-            <div class="card-header" style="background-color: #f0f2ff;">Order Tracker</div>
-            <div class="card-body">
-                <p>Total Orders Today: 72</p>
-                <p>Assigned: 68 | Unassigned: 4</p>
-                <p>Cancelled: 3 | Returns: 2</p>
-            </div>
-        </div>
-    </div>
+@* <div class="row"> *@
+@*     <div class="col-md-6"> *@
+@*         <div class="card border-theme mb-3"> *@
+@*             <div class="card-header" style="background-color: #f0f2ff;">Order Tracker</div> *@
+@*             <div class="card-body"> *@
+@*                 <p>Total Orders Today: 72</p> *@
+@*                 <p>Assigned: 68 | Unassigned: 4</p> *@
+@*                 <p>Cancelled: 3 | Returns: 2</p> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
 
-    <div class="col-md-6">
-        <div class="card border-theme mb-3">
-            <div class="card-header" style="background-color: #f0f2ff;">Worker Performance</div>
-            <div class="card-body">
-                <p>Top Performer: Rakesh Kumar (12 deliveries)</p>
-                <p>Average Delivery Time: 36 mins</p>
-                <p>Issues Reported: 1</p>
-            </div>
-        </div>
-    </div>
-</div>
+@*     <div class="col-md-6"> *@
+@*         <div class="card border-theme mb-3"> *@
+@*             <div class="card-header" style="background-color: #f0f2ff;">Worker Performance</div> *@
+@*             <div class="card-body"> *@
+@*                 <p>Top Performer: Rakesh Kumar (12 deliveries)</p> *@
+@*                 <p>Average Delivery Time: 36 mins</p> *@
+@*                 <p>Issues Reported: 1</p> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
 

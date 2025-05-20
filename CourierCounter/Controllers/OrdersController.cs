@@ -70,7 +70,7 @@ namespace CourierCounter.Controllers
         public async Task<IActionResult> UpdateOrder(OrdersViewModel data)
         {
             var result = await _orderServices.UpdateOrder(data);
-            return View();
+            return View( );
         }
     }
 }

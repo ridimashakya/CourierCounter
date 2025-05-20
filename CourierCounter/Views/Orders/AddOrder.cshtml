@@ -4,6 +4,12 @@
 @{
     Layout = "_AdminLayout";
 }
+<style>
+    #map {
+        height: 180px;
+    }
+</style>
+
 
 <br />
 <h3>Order Entry</h3>
@@ -31,44 +37,112 @@
     </div>
 
     <br />
-    <h4><u>Parcel Information</u></h4>
+    <h4 class="mt-5"><u>Parcel Information</u></h4>
 
-    <div class="col-md-6">
-        <label asp-for="DistanceInKm" class="form-label">Distance (km)</label>
-        <input asp-for="DistanceInKm" class="form-control" type="number" step="0.01" />
-        <span asp-validation-for="DistanceInKm" class="text-danger"></span>
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <label asp-for="DeliveryZone" class="form-label">Delivery Zone</label>
+            <select asp-for="DeliveryZone" class="form-select" id="DeliveryZone" asp-items="Html.GetEnumSelectList<DeliveryZoneEnum>()">
+                <option value="">Choose...</option>
+            </select>
+            <span asp-validation-for="DeliveryZone" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="DeliveryAddress" class="form-label">Delivery Address</label>
+            <input asp-for="DeliveryAddress" class="form-control" id="DeliveryAddress" />
+            <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="DistanceInKm" class="form-label">Distance (km)</label>
+            <input asp-for="DistanceInKm" class="form-control" type="number" step="0.01" />
+            <span asp-validation-for="DistanceInKm" class="text-danger"></span>
+        </div>
     </div>
 
-    <div class="col-md-6">
-        <label asp-for="WeightInKg" class="form-label">Weight (kg)</label>
-        <input asp-for="WeightInKg" class="form-control" type="number" step="0.01" />
-        <span asp-validation-for="WeightInKg" class="text-danger"></span>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <label asp-for="WeightInKg" class="form-label">Weight (kg)</label>
+            <input asp-for="WeightInKg" class="form-control" type="number" step="0.01" />
+            <span asp-validation-for="WeightInKg" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="UrgencyLevel" class="form-label">Urgency Level</label>
+            <select asp-for="UrgencyLevel" class="form-select" asp-items="Html.GetEnumSelectList<UrgencyLevelEnum>()">
+                <option value="">Choose...</option>
+            </select>
+            <span asp-validation-for="UrgencyLevel" class="text-danger"></span>
+        </div>
     </div>
 
-    <div class="col-md-4">
-        <label asp-for="UrgencyLevel" class="form-label">Urgency Level</label>
-        <select asp-for="UrgencyLevel" class="form-select" asp-items="Html.GetEnumSelectList<UrgencyLevelEnum>()">
-            <option value="">Choose...</option>
-        </select>
-        <span asp-validation-for="UrgencyLevel" class="text-danger"></span>
-    </div>
-
-
-    <div class="col-md-6">
-        <label asp-for="DeliveryAddress" class="form-label">Delivery Address</label>
-        <input asp-for="DeliveryAddress" class="form-control" />
-        <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
-    </div>
-
-    <div class="col-md-4">
-        <label asp-for="DeliveryZone" class="form-label">Delivery Zone</label>
-        <select asp-for="DeliveryZone" class="form-select" asp-items="Html.GetEnumSelectList<DeliveryZoneEnum>()">
-            <option value="">Choose...</option>
-        </select>
-        <span asp-validation-for="DeliveryZone" class="text-danger"></span>
-    </div>
+    <div class="mt-4" id="map"></div>
 
     <div class="col-12">
         <button type="submit" class="btn btn-primary confirm-order" style="background-color: #747fb6; border-color: #747fb6;">Confirm</button>
     </div>
 </form>
+
+    <script>
+        const deliveryZoneCoords = {
+            "1": [27.7172, 85.3240], // Kathmandu
+            "2": [27.6644, 85.3188], // Lalitpur
+            "3": [27.6710, 85.4298], // Bhaktapur
+            "4": [27.5500, 85.3000]  // Outside Valley (e.g., Kirtipur)
+        };
+
+        let map = L.map('map').setView([27.7172, 85.3240], 10);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        let startMarker, endMarker;
+
+        document.getElementById("DeliveryZone").addEventListener("change", function () {
+            const selectedZone = this.value;
+            if (deliveryZoneCoords[selectedZone]) {
+                const [lat, lng] = deliveryZoneCoords[selectedZone];
+                if (startMarker) map.removeLayer(startMarker);
+                startMarker = L.marker([lat, lng], { title: "Starting Point" }).addTo(map);
+                map.setView([lat, lng], 12);
+                calculateDistance(); // calculate if endMarker is already placed
+            }
+        });
+
+        document.getElementById("DeliveryAddress").addEventListener("input", function () {
+            const address = this.value;
+
+            if (address.trim() !== "") {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const lat = parseFloat(data[0].lat);
+                            const lng = parseFloat(data[0].lon);
+
+                            if (endMarker) map.removeLayer(endMarker);
+                            endMarker = L.marker([lat, lng], { title: "Delivery Address", draggable: true }).addTo(map);
+                            map.setView([lat, lng], 12);
+                            calculateDistance();
+
+                            endMarker.on('dragend', function () {
+                                calculateDistance();
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Geocoding error:', error));
+            }
+        });
+
+        function calculateDistance() {
+            if (startMarker && endMarker) {
+                const start = startMarker.getLatLng();
+                const end = endMarker.getLatLng();
+                const distance = map.distance(start, end) / 1000; // in km
+                console.log('Calculated Distance: ' + distance.toFixed(2) + ' km');
+                document.getElementById("DistanceInKm").value = distance.toFixed(2);
+            }
+        }
+</script>
