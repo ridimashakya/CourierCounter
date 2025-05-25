@@ -36,23 +36,22 @@ namespace CourierCounter.Services
 
             if (!res.Succeeded)
                 return new ApiResponse<string>(false, "Login Failed! Incorrect credentials.");
-            else
+
+            var workerStatus = _dbContext.AllWorkers.Where(x => x.Email == data.Email).Select(x => x.Status).FirstOrDefault();
+
+            if (workerStatus != StatusEnum.Approved)
             {
-                var workerStatus = _dbContext.AllWorkers.Where(x => x.Email == data.Email).Select(x => x.Status).FirstOrDefault();
-
-                if (workerStatus != StatusEnum.Approved)
-                {
-                    string message = workerStatus == StatusEnum.Pending
-                                     ? "Login Failed! Your profile is still in the process of verification"
-                                     : "Login Failed! Yor profile has been rejected. Please contact the Admin.";
-                    return new ApiResponse<string>(false, message);
-                }
-
-                var user = await _userManager.FindByEmailAsync(data.Email);
-                var token = _tokenService.GenerateToken(user);
-
-                result = new ApiResponse<string>(true, "Login Successfull! You are now verified worker.", user.Id);
+                string message = workerStatus == StatusEnum.Pending
+                      ? "Login Failed! Your profile is still in the process of verification"
+                      : "Login Failed! Your profile has been rejected. Please contact the Admin.";
+                return new ApiResponse<string>(false, message);
             }
+
+            var user = await _userManager.FindByEmailAsync(data.Email);
+            var token = _tokenService.GenerateToken(user);
+
+            result = new ApiResponse<string>(true, "Login Successfull! You are now verified worker.", token);
+
             return result;
         }
 
@@ -66,7 +65,6 @@ namespace CourierCounter.Services
             return true;
         }
 
-        [HttpPost]
         public async Task<bool> AdminLogout()
         {
             try

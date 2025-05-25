@@ -88,21 +88,22 @@ using CourierCounter.Models.Entities;
 using CourierCounter.Models.Enum;
 using CourierCounter.Services.Interfaces;
 using Microsoft.ML;
+using System.Runtime.InteropServices;
 
 namespace CourierCounter.Services
 {
     public class MLPredictionService : IMLPredictionService
     {
         public float PredictWage(DeliveryOrderDataModel newOrder)
-        {   
+        {
             {
-                const float baseFee = 50f;
-                const float ratePerKm = 10f;
-                const float weightMultiplier = 5f;
-                const float zoneBonusMultiplier = 15f;
+                const float baseFee = 60f;
+                const float baseKm = 3f;
+                const float extraPerKm = 10f;
 
-                float distanceCost = newOrder.DistanceInKm * ratePerKm;
-                float weightCost = newOrder.WeightInKg * weightMultiplier;
+                const float zoneBonusMultiplier = 20f;
+
+                float extradistanceCost = newOrder.DistanceInKm > baseKm ? (newOrder.DistanceInKm - baseKm) * extraPerKm : 0f;
 
                 float urgencyCost = newOrder.UrgencyLevel switch
                 {
@@ -112,13 +113,22 @@ namespace CourierCounter.Services
                     _ => 0f
                 };
 
-                float zoneBonus = newOrder.Zone * zoneBonusMultiplier;
+                float weightFee = newOrder.WeightInKg switch
+                {
+                    <= 0 => 0f,
+                    <= 10 => 20f,
+                    <= 20 => 40f,
+                    <= 30 => 60f,
+                    <= 40 => 80f,
+                    <= 50 => 100f,
+                    _ => 120f
+                };
 
-                float totalWage = baseFee + distanceCost + weightCost + urgencyCost + zoneBonus;
+                float outOfValleyZoneBonus = newOrder.Zone == 4 ? zoneBonusMultiplier : 0f;
+                float totalWage = baseFee + extradistanceCost + weightFee + urgencyCost + outOfValleyZoneBonus;
 
                 return totalWage;
             }
-
         }
     }
 }

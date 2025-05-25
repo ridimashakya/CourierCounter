@@ -351,6 +351,7 @@ namespace CourierCounter.Services
                 }).ToList();
 
                 _dbContext.WorkerOrder.AddRange(workerOrdersList);
+
                 await _dbContext.SaveChangesAsync();
 
                 result = new ApiResponse<bool>(true, "Selected orders saved successfully!");

@@ -1,6 +1,7 @@
 ﻿using CourierCounter.Models;
 using CourierCounter.Models.ApiModels;
 using CourierCounter.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -9,6 +10,7 @@ namespace CourierCounter.Controllers.ApiController
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class OrderController : Controller
     {
         private readonly IOrderServices _orderServices;
@@ -42,23 +44,27 @@ namespace CourierCounter.Controllers.ApiController
             return Ok(result);
         }
 
-        [Route("inprogressorders/{userId}")]
+        [Route("inprogressorders")]
         [HttpGet]
-        public async Task<IActionResult> InProgressOrders(string userId)
+        public async Task<IActionResult> InProgressOrders()
         {
-            //string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            userId = userId == "null" ? "92c5b40f-8a3f-4f6d-8eb1-d08eb03747f9" : userId;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID not found in token");
 
             var result = await _orderServices.GetInProgressSelectedOrders(userId);
             return Ok(result);
         }
 
-        [Route("deliveredorders/{userId}")]
+        [Route("deliveredorders")]
         [HttpGet]
-        public async Task<IActionResult> DeliveredOrders(string userId)
+        public async Task<IActionResult> DeliveredOrders()
         {
-            //string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            userId = userId == "null" ? "92c5b40f-8a3f-4f6d-8eb1-d08eb03747f9" : userId;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID not found in token");
 
             var result = await _orderServices.GetCompletedSelectedOrders(userId);
             return Ok(result);
