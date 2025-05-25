@@ -19,7 +19,7 @@ namespace CourierCounter.Controllers.ApiController
 
         [Route("create")]
         [HttpPost]
-        public async Task<IActionResult> RegisterWorker([FromBody] RegistrationViewModel data)
+        public async Task<IActionResult> RegisterWorker([FromForm] RegistrationViewModel data)
         {
             if (!ModelState.IsValid)
             {

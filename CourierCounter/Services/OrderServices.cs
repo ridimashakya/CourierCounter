@@ -25,8 +25,6 @@ namespace CourierCounter.Services
             ApiResponse<bool> result;
             try
             {
-                var trackingId = GenerateTrackingId();
-
                 DeliveryOrderDataModel model = new DeliveryOrderDataModel
                 {
                     Zone = (float)data.DeliveryZone,
@@ -42,7 +40,7 @@ namespace CourierCounter.Services
                     CustomerName = data.CustomerName,
                     CustomerEmail = data.CustomerEmail,
                     CustomerContactNumber = data.CustomerContactNumber,
-                    TrackingId = trackingId,
+                    //TrackingId = trackingId,
                     DeliveryAddress = data.DeliveryAddress,
                     DeliveryZone = data.DeliveryZone,
                     DistanceInKm = data.DistanceInKm,
@@ -52,6 +50,12 @@ namespace CourierCounter.Services
                 };
 
                 _dbContext.Orders.Add(orderEntity);
+                await _dbContext.SaveChangesAsync();
+
+                string trackingId = GenerateTrackingId(orderEntity.Id);
+                orderEntity.TrackingId = trackingId;
+
+                _dbContext.Orders.Update(orderEntity);
                 await _dbContext.SaveChangesAsync();
 
                 result = new ApiResponse<bool>(true, "New Order Added Successfully!");
@@ -225,20 +229,10 @@ namespace CourierCounter.Services
             return result;
         }
 
-        private string GenerateTrackingId()
+        private string GenerateTrackingId(int orderId)
         {
             string datePart = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
-            string randomPart = GenerateRandomString(5).ToUpper();
-
-            return $"{randomPart}-{datePart}";
-        }
-
-        private string GenerateRandomString(int length)
-        {
-            var random = new Random();
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+            return $"{orderId}-{datePart}";
         }
 
         public async Task<ApiResponse<List<ForOrderViewModel>>> GetPendingSelectedOrders()
@@ -363,6 +357,62 @@ namespace CourierCounter.Services
             }
             return result;
         }
+
+        public async Task<ApiResponse<bool>> SavedCompletedOrders(WorkerOrdersViewModel data)
+        {
+            ApiResponse<bool> result;
+            var completionDate = DateTime.Now;
+
+            var orders = await _dbContext.Orders
+                .Where(x => data.OrderId.Contains(x.Id))
+                .ToListAsync();
+
+            if (orders.Count != data.OrderId.Count)
+            {
+                result = new ApiResponse<bool>(false, "Some orders do not exist");
+                return result;
+            }
+
+            try
+            {
+                foreach (var order in orders)
+                {
+                    order.Status = OrderStatusEnum.Delivered;
+                }
+                _dbContext.Orders.UpdateRange(orders);
+
+                foreach (var orderId in data.OrderId)
+                {
+                    var existingWorkerOrder = await _dbContext.WorkerOrder
+                        .FirstOrDefaultAsync(wo => wo.OrderId == orderId && wo.WorkerId == data.WorkerId);
+
+                    if (existingWorkerOrder == null)
+                    {
+                        var newWorkerOrder = new WorkerOrders
+                        {
+                            OrderId = orderId,
+                            WorkerId = data.WorkerId,
+                            CreatedDate = completionDate
+                        };
+                        _dbContext.WorkerOrder.Add(newWorkerOrder);
+                    }
+                    else
+                    {
+                        _dbContext.WorkerOrder.Update(existingWorkerOrder);
+                    }
+                }
+                await _dbContext.SaveChangesAsync();
+
+                result = new ApiResponse<bool>(true, "Selected orders marked as completed successfully!");
+            }
+            catch (Exception)
+            {
+                result = new ApiResponse<bool>(false, "Error marking the selected orders as completed.");
+            }
+
+            return result;
+        }
+
     }
 }
 

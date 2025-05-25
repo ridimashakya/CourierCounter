@@ -48,7 +48,10 @@ namespace CourierCounter.Services
             }
 
             var user = await _userManager.FindByEmailAsync(data.Email);
-            var token = _tokenService.GenerateToken(user);
+            var worker = _dbContext.AllWorkers.FirstOrDefault(x => x.Email == data.Email);
+            if (worker == null)
+                return new ApiResponse<string>(false, "Worker not found!");
+            var token = _tokenService.GenerateToken(user, worker.Id);
 
             result = new ApiResponse<string>(true, "Login Successfull! You are now verified worker.", token);
 

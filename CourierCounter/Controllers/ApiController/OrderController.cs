@@ -4,6 +4,7 @@ using CourierCounter.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 
 namespace CourierCounter.Controllers.ApiController
@@ -36,9 +37,11 @@ namespace CourierCounter.Controllers.ApiController
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [Route("pendingorders")]
         [HttpGet]
         public async Task<IActionResult> PendingOrders()
+
         {
             var result = await _orderServices.GetPendingSelectedOrders();
             return Ok(result);
@@ -54,6 +57,14 @@ namespace CourierCounter.Controllers.ApiController
                 return Unauthorized("User ID not found in token");
 
             var result = await _orderServices.GetInProgressSelectedOrders(userId);
+            return Ok(result);
+        }
+
+        [Route("savecompletedorders")]
+        [HttpPost]
+        public async Task<IActionResult> SavedCompletedOrders(WorkerOrdersViewModel data)
+        {
+            var result = await _orderServices.SavedCompletedOrders(data);
             return Ok(result);
         }
 

@@ -31,12 +31,9 @@ namespace CourierCounter.Services
         {
             ApiResponse<bool> result;
 
-            //Database Transaction
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
-                //add user to identity table
-                //ApplicationUser is an entity
                 ApplicationUser user = new ApplicationUser
                 {
                     Email = data.Email,
@@ -49,40 +46,64 @@ namespace CourierCounter.Services
                 {
                     return new ApiResponse<bool>(false, "Registration Failed!");
                 }
-                else
+
+                // Prepare folder to save images
+                //string imageFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "uploads");
+                //if (!Directory.Exists(imageFolder))
+                //{
+                //    Directory.CreateDirectory(imageFolder);
+                //}
+
+                //string SaveImage(IFormFile file)
+                //{
+                //    string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                //    string filePath = Path.Combine(imageFolder, fileName);
+
+                //    using (var stream = new FileStream(filePath, FileMode.Create))
+                //    {
+                //        file.CopyTo(stream);
+                //    }
+
+                //    return Path.Combine("images", "uploads", fileName).Replace("\\", "/");
+                //}
+                //var vehicleImagePath = SaveImage(data.VehicleRegistrationNumberImage);
+                //var licenseImagePath = SaveImage(data.LicenseNumberImage);
+                //var nidImagePath = SaveImage(data.NationalIdNumberImage);
+
+                // Map to database entity including image paths
+                Workers workerEntity = new Workers
                 {
-                    //Mapping for database entity
-                    Workers workerEntity = new Workers
-                    {
-                        UserId = user.Id,
-                        FullName = data.FullName,
-                        Email = data.Email,
-                        Password = data.Password,
-                        ContactNumber = data.ContactNumber,
-                        HomeAddress = data.HomeAddress,
-                        VehicleRegistrationNumber = data.VehicleRegistrationNumber,
-                        LicenseNumber = data.LicenseNumber,
-                        NationalIdNumber = data.NationalIdNumber,
-                        Status = StatusEnum.Pending
-                    };
+                    UserId = user.Id,
+                    FullName = data.FullName,
+                    Email = data.Email,
+                    Password = data.Password,
+                    ContactNumber = data.ContactNumber,
+                    HomeAddress = data.HomeAddress,
+                    VehicleRegistrationNumber = data.VehicleRegistrationNumber,
+                    LicenseNumber = data.LicenseNumber,
+                    NationalIdNumber = data.NationalIdNumber,
+                    //VehicleRegistrationNumberImagePath = vehicleImagePath,
+                    //LicenseNumberImagePath = licenseImagePath,
+                    //NationalIdNumberImagePath = nidImagePath,
+                    Status = StatusEnum.Pending
+                };
 
-                    _dbContext.AllWorkers.Add(workerEntity);
-                    await _dbContext.SaveChangesAsync();
+                _dbContext.AllWorkers.Add(workerEntity);
+                await _dbContext.SaveChangesAsync();
 
-                    //Commit transaction
-                    await transaction.CommitAsync();
+                await transaction.CommitAsync();
 
-                    result = new ApiResponse<bool>(true, "Successfully Registered!");
-                }
+                result = new ApiResponse<bool>(true, "Successfully Registered!");
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync(); //rollback all changes
+                await transaction.RollbackAsync();
                 result = new ApiResponse<bool>(false, "Registration Failed!");
             }
 
             return result;
         }
+
 
         public List<Worker> GetAllWorker(StatusEnum? status = null)
         {

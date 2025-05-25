@@ -4,6 +4,6 @@ namespace CourierCounter.Services.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateToken(ApplicationUser user);
+        string GenerateToken(ApplicationUser user, int workerId);
     }
 }

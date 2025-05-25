@@ -5,7 +5,7 @@ namespace CourierCounter.Models.Entities
     public class Orders
     {
         public int Id { get; set; }
-        public required string TrackingId { get; set; }
+        public string TrackingId { get; set; } = string.Empty;
         public required string CustomerName { get; set; }
         public required string CustomerContactNumber { get; set; }
         public required string CustomerEmail { get; set; }

@@ -15,6 +15,11 @@ namespace CourierCounter.Models.Entities
         public required string VehicleRegistrationNumber { get; set; }
         public required string LicenseNumber { get; set; }
         public required string NationalIdNumber { get; set; }
+
         public StatusEnum Status { get; set; }
+
+        //public required string VehicleRegistrationNumberImagePath { get; set; }
+        //public required string LicenseNumberImagePath { get; set; }
+        //public required string NationalIdNumberImagePath { get; set; }
     }
 }
