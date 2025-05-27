@@ -18,8 +18,8 @@ namespace CourierCounter.Models.Entities
 
         public StatusEnum Status { get; set; }
 
-        //public required string VehicleRegistrationNumberImagePath { get; set; }
-        //public required string LicenseNumberImagePath { get; set; }
-        //public required string NationalIdNumberImagePath { get; set; }
+        public string VehicleRegistrationNumberImagePath { get; set; } = string.Empty;
+        public string LicenseNumberImagePath { get; set; } = string.Empty;
+        public string NationalIdNumberImagePath { get; set; } = string.Empty;
     }
 }

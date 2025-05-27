@@ -7,7 +7,7 @@
 
 <style>
     .btn-approve {
-        background-color: #a8d5a2; /* soft green */
+        background-color: #a8d5a2;
         color: #1e4620;
         border: none;
     }
@@ -17,14 +17,23 @@
         }
 
     .btn-reject {
-        background-color: #f5b5b5; /* soft red */
+        background-color: #f5b5b5;
         color: #5c1c1c;
         border: none;
     }
 
-        .btn-reject:hover {
-            background-color: #e99c9c;
-        }
+    .btn-reject:hover {
+        background-color: #e99c9c;
+    }
+
+    .img-thumbnail {
+        width: 400px;
+        height: auto;
+        margin: 8px 8px 8px 0; 
+        object-fit: contain;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
 </style>
 
 @* each worker detail page *@
@@ -38,6 +47,28 @@
     <li class="list-group-item">Vehicle Number : @Model.VehicleRegistrationNumber</li>
     <li class="list-group-item">National Id : @Model.NationalIdNumber</li>
     <li class="list-group-item"> Status : @Model.Status</li>
+
+    <li class="list-group-item">
+        Vehicle Registration Image:
+        <br />
+        <a href="@Url.Content("~/" + Model.VehicleRegistrationNumberImagePath)" target="_blank" rel="noopener noreferrer">
+            <img src="@Url.Content("~/" + Model.VehicleRegistrationNumberImagePath)" alt="Vehicle Registration" class="img-thumbnail" />
+        </a>
+    </li>
+    <li class="list-group-item">
+        License Image:
+        <br />
+        <a href="@Url.Content("~/" + Model.LicenseNumberImagePath)" target="_blank" rel="noopener noreferrer">
+            <img src="@Url.Content("~/" + Model.LicenseNumberImagePath)" alt="License Image" class="img-thumbnail" />
+        </a>
+    </li>
+    <li class="list-group-item">
+        National ID Image:
+        <br />
+        <a href="@Url.Content("~/" + Model.NationalIdNumberImagePath)" target="_blank" rel="noopener noreferrer">
+            <img src="@Url.Content("~/" + Model.NationalIdNumberImagePath)" alt="National ID Image" class="img-thumbnail" />
+        </a>
+    </li>
 </ul>
 
 @if (Model.Status == CourierCounter.Models.Enum.StatusEnum.Pending)

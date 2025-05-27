@@ -13,6 +13,11 @@ namespace CourierCounter.Models.ApiModels
         public string VehicleRegistrationNumber { get; set; }
         public string LicenseNumber { get; set; }
         public string NationalIdNumber { get; set; }
+
+        public string VehicleRegistrationNumberImagePath { get; set; }
+        public string LicenseNumberImagePath { get; set; }
+        public string NationalIdNumberImagePath { get; set; }
+
         //public StatusEnum Status { get; set; }
     }
 }

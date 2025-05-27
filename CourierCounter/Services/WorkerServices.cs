@@ -27,7 +27,7 @@ namespace CourierCounter.Services
             _userManager = userManager;
         }
 
-        public async Task<ApiResponse<bool>> CreateWorker(RegistrationViewModel data)
+        public async Task<ApiResponse<bool>> CreateWorker([FromForm] RegistrationViewModel data)
         {
             ApiResponse<bool> result;
 
@@ -47,28 +47,28 @@ namespace CourierCounter.Services
                     return new ApiResponse<bool>(false, "Registration Failed!");
                 }
 
-                // Prepare folder to save images
-                //string imageFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "uploads");
-                //if (!Directory.Exists(imageFolder))
-                //{
-                //    Directory.CreateDirectory(imageFolder);
-                //}
+                //Prepare folder to save images
+                string imageFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "uploads");
+                if (!Directory.Exists(imageFolder))
+                {
+                    Directory.CreateDirectory(imageFolder);
+                }
 
-                //string SaveImage(IFormFile file)
-                //{
-                //    string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-                //    string filePath = Path.Combine(imageFolder, fileName);
+                string SaveImage(IFormFile file)
+                {
+                    string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                    string filePath = Path.Combine(imageFolder, fileName);
 
-                //    using (var stream = new FileStream(filePath, FileMode.Create))
-                //    {
-                //        file.CopyTo(stream);
-                //    }
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
 
-                //    return Path.Combine("images", "uploads", fileName).Replace("\\", "/");
-                //}
-                //var vehicleImagePath = SaveImage(data.VehicleRegistrationNumberImage);
-                //var licenseImagePath = SaveImage(data.LicenseNumberImage);
-                //var nidImagePath = SaveImage(data.NationalIdNumberImage);
+                    return Path.Combine("images", "uploads", fileName).Replace("\\", "/");
+                }
+                var vehicleImagePath = SaveImage(data.VehicleRegistrationNumberImage);
+                var licenseImagePath = SaveImage(data.LicenseNumberImage);
+                var nidImagePath = SaveImage(data.NationalIdNumberImage);
 
                 // Map to database entity including image paths
                 Workers workerEntity = new Workers
@@ -82,9 +82,9 @@ namespace CourierCounter.Services
                     VehicleRegistrationNumber = data.VehicleRegistrationNumber,
                     LicenseNumber = data.LicenseNumber,
                     NationalIdNumber = data.NationalIdNumber,
-                    //VehicleRegistrationNumberImagePath = vehicleImagePath,
-                    //LicenseNumberImagePath = licenseImagePath,
-                    //NationalIdNumberImagePath = nidImagePath,
+                    VehicleRegistrationNumberImagePath = vehicleImagePath,
+                    LicenseNumberImagePath = licenseImagePath,
+                    NationalIdNumberImagePath = nidImagePath,
                     Status = StatusEnum.Pending
                 };
 
@@ -172,6 +172,9 @@ namespace CourierCounter.Services
                                     LicenseNumber = worker.LicenseNumber,
                                     NationalIdNumber = worker.NationalIdNumber,
                                     VehicleRegistrationNumber = worker.VehicleRegistrationNumber,
+                                    VehicleRegistrationNumberImagePath = worker.VehicleRegistrationNumberImagePath,
+                                    LicenseNumberImagePath = worker.LicenseNumberImagePath,
+                                    NationalIdNumberImagePath = worker.NationalIdNumberImagePath,
                                     Status = worker.Status
                                 }).FirstOrDefault();
             }
@@ -200,7 +203,10 @@ namespace CourierCounter.Services
                                            HomeAddress = worker.HomeAddress,
                                            LicenseNumber = worker.LicenseNumber,
                                            NationalIdNumber = worker.NationalIdNumber,
-                                           VehicleRegistrationNumber = worker.VehicleRegistrationNumber
+                                           VehicleRegistrationNumber = worker.VehicleRegistrationNumber,
+                                           LicenseNumberImagePath = worker.LicenseNumberImagePath,
+                                           NationalIdNumberImagePath = worker.NationalIdNumberImagePath,
+                                           VehicleRegistrationNumberImagePath = worker.VehicleRegistrationNumberImagePath
                                            //Status = worker.Status
                                        }).FirstOrDefaultAsync();
             }

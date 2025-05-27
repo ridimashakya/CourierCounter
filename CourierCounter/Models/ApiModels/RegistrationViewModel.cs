@@ -16,8 +16,8 @@ namespace CourierCounter.Models.ApiModels
         public required string LicenseNumber { get; set; }
         public required string NationalIdNumber { get; set; }
 
-        //public required IFormFile VehicleRegistrationNumberImage { get; set; }
-        //public required IFormFile LicenseNumberImage { get; set; }
-        //public required IFormFile NationalIdNumberImage { get; set; }
+        public required IFormFile VehicleRegistrationNumberImage { get; set; }
+        public required IFormFile LicenseNumberImage { get; set; }
+        public required IFormFile NationalIdNumberImage { get; set; }
     }                   
 }
