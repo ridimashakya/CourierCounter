@@ -18,6 +18,8 @@ namespace CourierCounter.Models.ApiModels
         public string LicenseNumberImagePath { get; set; }
         public string NationalIdNumberImagePath { get; set; }
 
+        public string ProfileImagePath { get; set; }
+
         //public StatusEnum Status { get; set; }
     }
 }

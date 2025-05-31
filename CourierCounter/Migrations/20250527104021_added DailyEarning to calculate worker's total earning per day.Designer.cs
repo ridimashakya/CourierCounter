@@ -4,6 +4,7 @@ using CourierCounter.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CourierCounter.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250527104021_added DailyEarning to calculate worker's total earning per day")]
+    partial class addedDailyEarningtocalculateworkerstotalearningperday
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,9 +101,6 @@ namespace CourierCounter.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("PaidDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<decimal>("TotalWage")
                         .HasColumnType("decimal(18,2)");
 
@@ -113,30 +113,6 @@ namespace CourierCounter.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DailyEarnings");
-                });
-
-            modelBuilder.Entity("CourierCounter.Models.Entities.EarningHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("TotalWages")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("WorkerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkerId");
-
-                    b.ToTable("EarningHistories");
                 });
 
             modelBuilder.Entity("CourierCounter.Models.Entities.Orders", b =>
@@ -209,10 +185,6 @@ namespace CourierCounter.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("WorkerId");
-
                     b.ToTable("WorkerOrder");
                 });
 
@@ -260,10 +232,6 @@ namespace CourierCounter.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfileImagePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -281,7 +249,7 @@ namespace CourierCounter.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AllWorkers", (string)null);
+                    b.ToTable("AllWorkers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -415,32 +383,6 @@ namespace CourierCounter.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("CourierCounter.Models.Entities.EarningHistory", b =>
-                {
-                    b.HasOne("CourierCounter.Models.Entities.Workers", "Worker")
-                        .WithMany()
-                        .HasForeignKey("WorkerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Worker");
-                });
-
-            modelBuilder.Entity("CourierCounter.Models.Entities.WorkerOrders", b =>
-                {
-                    b.HasOne("CourierCounter.Models.Entities.Orders", null)
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CourierCounter.Models.Entities.Workers", null)
-                        .WithMany()
-                        .HasForeignKey("WorkerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

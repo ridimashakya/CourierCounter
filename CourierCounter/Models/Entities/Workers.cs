@@ -1,7 +1,9 @@
 ﻿using CourierCounter.Models.Enum;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CourierCounter.Models.Entities
 {
+    [Table("AllWorkers")]
     public class Workers
     {
         public int Id { get; set; }
@@ -17,6 +19,8 @@ namespace CourierCounter.Models.Entities
         public required string NationalIdNumber { get; set; }
 
         public StatusEnum Status { get; set; }
+
+        public string ProfileImagePath { get; set; } = string.Empty;
 
         public string VehicleRegistrationNumberImagePath { get; set; } = string.Empty;
         public string LicenseNumberImagePath { get; set; } = string.Empty;

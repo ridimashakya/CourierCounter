@@ -39,6 +39,13 @@
 @* each worker detail page *@
 <ul class="list-group">
     <li class="list-group-item">Id : @Model.Id</li>
+
+    <li class="list-group-item">
+        Profile Image:<br />
+        <img src="@(string.IsNullOrEmpty(Model.ProfileImagePath) ? Url.Content("~/images/no-image.png") : Url.Content("~/" + Model.ProfileImagePath))"
+             alt="Profile Image" style="max-width:200px; max-height:200px;" />
+    </li>
+
     <li class="list-group-item">Full Name : @Model.FullName</li>
     <li class="list-group-item">Email : @Model.Email</li>
     <li class="list-group-item">Contact Number : @Model.ContactNumber</li>

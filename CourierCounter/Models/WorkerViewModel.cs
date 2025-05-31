@@ -1,4 +1,5 @@
 ﻿using CourierCounter.Models.Enum;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CourierCounter.Models
 {
@@ -23,6 +24,8 @@ namespace CourierCounter.Models
         public string VehicleRegistrationNumberImagePath { get; set; } = string.Empty;
         public string LicenseNumberImagePath { get; set; } = string.Empty;
         public string NationalIdNumberImagePath { get; set; } = string.Empty;
+
+        public string ProfileImagePath { get; set; } = string.Empty;
 
         public StatusEnum Status { get; set; }
     }

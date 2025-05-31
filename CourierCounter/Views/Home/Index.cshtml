@@ -25,61 +25,120 @@
     <h1 class="h2" style="color: #747fb6;">Dashboard</h1>
 </div>
 
-<!-- Dashboard Cards -->
+<!-- Dashboard Main Row -->
 <div class="row">
-    <div class="col-md-4">
+    <!-- Left Column -->
+    <div class="col-md-6">
+        <!-- Summary Cards -->
         <div class="card bg-theme mb-3">
             <div class="card-header">Today's Deliveries</div>
             <div class="card-body">
                 <h5 class="card-title">@Model.OrdersCount.TotalOrder Deliveries</h5>
-                <p>Completed: @Model.OrdersCount.DeliveredOrderCount | Pending: @Model.OrdersCount.PendingOrderCount | InProgress: @Model.OrdersCount.InProgressOrderCount</p>
+                <p>
+                    Completed: @Model.OrdersCount.DeliveredOrderCount |
+                    Pending: @Model.OrdersCount.PendingOrderCount |
+                    InProgress: @Model.OrdersCount.InProgressOrderCount
+                </p>
             </div>
         </div>
-    </div>
 
-    @* <div class="col-md-4"> *@
-    @*     <div class="card bg-theme-light mb-3"> *@
-    @*         <div class="card-header">Earnings Overview</div> *@
-    @*         <div class="card-body"> *@
-    @*             <h5 class="card-title">Rs. 24,500</h5> *@
-    @*             <p>Revenue generated today</p> *@
-    @*         </div> *@
-    @*     </div> *@
-    @* </div> *@
-
-    <div class="col-md-4">
         <div class="card bg-theme mb-3">
             <div class="card-header">Total Workers</div>
             <div class="card-body">
                 <h5 class="card-title">@Model.WorkersCount.TotalWorker Workers</h5>
-                <p>Pending: @Model.WorkersCount.PendingWorker | Verified: @Model.WorkersCount.ApprovedWorker | Rejected: @Model.WorkersCount.RejectedWorker</p>
+                <p>
+                    Pending: @Model.WorkersCount.PendingWorker |
+                    Verified: @Model.WorkersCount.ApprovedWorker |
+                    Rejected: @Model.WorkersCount.RejectedWorker
+                </p>
+            </div>
+        </div>
+
+        <!-- Bar Chart Card -->
+        <div class="card mb-3" style="background-color: white;">
+            <div class="card-header">Worker Status Distribution</div>
+            <div class="card-body text-center">
+                <canvas id="workerBarChart" width="300" height="128"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-md-6">
+        <div class="card mb-3" style="background-color: white;">
+            <div class="card-header">Order Distribution</div>
+            <div class="card-body text-center">
+                <canvas id="orderPieChart" width="250" height="250"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Order & Worker Overview -->
-@* <div class="row"> *@
-@*     <div class="col-md-6"> *@
-@*         <div class="card border-theme mb-3"> *@
-@*             <div class="card-header" style="background-color: #f0f2ff;">Order Tracker</div> *@
-@*             <div class="card-body"> *@
-@*                 <p>Total Orders Today: 72</p> *@
-@*                 <p>Assigned: 68 | Unassigned: 4</p> *@
-@*                 <p>Cancelled: 3 | Returns: 2</p> *@
-@*             </div> *@
-@*         </div> *@
-@*     </div> *@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-@*     <div class="col-md-6"> *@
-@*         <div class="card border-theme mb-3"> *@
-@*             <div class="card-header" style="background-color: #f0f2ff;">Worker Performance</div> *@
-@*             <div class="card-body"> *@
-@*                 <p>Top Performer: Rakesh Kumar (12 deliveries)</p> *@
-@*                 <p>Average Delivery Time: 36 mins</p> *@
-@*                 <p>Issues Reported: 1</p> *@
-@*             </div> *@
-@*         </div> *@
-@*     </div> *@
-@* </div> *@
+<script>
+    // Pie Chart
+    const ctx = document.getElementById('orderPieChart').getContext('2d');
+    const orderPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Delivered', 'Pending', 'In Progress'],
+            datasets: [{
+                data: [
+                    @Model.OrdersCount.DeliveredOrderCount,
+                    @Model.OrdersCount.PendingOrderCount,
+                    @Model.OrdersCount.InProgressOrderCount
+                ],
+                backgroundColor: ['#a2aad9', '#a94442', '#f0ad4e'], 
+                borderColor: ['#ffffff', '#ffffff', '#ffffff'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#333'
+                    }
+                }
+            }
+        }
+    });
 
+    // Bar Chart
+    const barCtx = document.getElementById('workerBarChart').getContext('2d');
+    const workerBarChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Pending', 'Verified', 'Rejected'],
+            datasets: [{
+                label: 'Number of Workers',
+                data: [
+                    @Model.WorkersCount.PendingWorker,
+                    @Model.WorkersCount.ApprovedWorker,
+                    @Model.WorkersCount.RejectedWorker
+                ],
+                backgroundColor: ['#f0ad4e', '#a2aad9', '#a94442'], 
+                borderColor: '#ffffff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#333' }
+                },
+                x: {
+                    ticks: { color: '#333' }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>

@@ -290,27 +290,28 @@ namespace CourierCounter.Services
 
         public async Task<ApiResponse<List<ForOrderViewModel>>> GetCompletedSelectedOrders(string userId)
         {
-            //ApiResponse<List<ForOrderViewModel>> response = null;
-
             try
             {
-                var workers = await (from worker in _dbContext.AllWorkers
-                                     join wo in _dbContext.WorkerOrder on worker.Id equals wo.Id
-                                     join o in _dbContext.Orders on wo.Id equals o.Id
-                                     where o.Status == OrderStatusEnum.Delivered
-                                     select new ForOrderViewModel
-                                     {
-                                         DeliveryAddress = o.DeliveryAddress,
-                                         TrackingId = o.TrackingId,
-                                         DistanceInKm = o.DistanceInKm,
-                                         WeightInKg = o.WeightInKg,
-                                         UrgencyLevel = o.UrgencyLevel.ToString(),
-                                         Wage = o.Wage
-                                     }).ToListAsync();
+                var workersDeliveredOrders = await (
+                    from worker in _dbContext.AllWorkers
+                    where worker.UserId == userId
+                    join wo in _dbContext.WorkerOrder on worker.Id equals wo.WorkerId
+                    join o in _dbContext.Orders on wo.OrderId equals o.Id
+                    where o.Status == OrderStatusEnum.Delivered
+                    select new ForOrderViewModel
+                    {
+                        DeliveryAddress = o.DeliveryAddress,
+                        TrackingId = o.TrackingId,
+                        DistanceInKm = o.DistanceInKm,
+                        WeightInKg = o.WeightInKg,
+                        UrgencyLevel = o.UrgencyLevel.ToString(),
+                        Wage = o.Wage
+                    }
+                ).ToListAsync();
 
-                return new ApiResponse<List<ForOrderViewModel>>(true, "Completed orders listed sucessfully!", workers);
+                return new ApiResponse<List<ForOrderViewModel>>(true, "Completed orders listed successfully!", workersDeliveredOrders);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new ApiResponse<List<ForOrderViewModel>>(false, "Completed orders not listed.");
             }
@@ -320,9 +321,8 @@ namespace CourierCounter.Services
         {
             ApiResponse<bool> result;
 
-            var createDate = DateTime.Now;
-
             var orders = await _dbContext.Orders.Where(x => data.OrderId.Contains(x.Id)).ToListAsync();
+
             if (orders.Count != data.OrderId.Count)
             {
                 result = new ApiResponse<bool>(false, "Some orders do not exist");
@@ -341,7 +341,7 @@ namespace CourierCounter.Services
                 {
                     WorkerId = data.WorkerId,
                     OrderId = orderId,
-                    CreatedDate = createDate
+                    CreatedDate = DateTime.Now
                 }).ToList();
 
                 _dbContext.WorkerOrder.AddRange(workerOrdersList);
@@ -352,7 +352,6 @@ namespace CourierCounter.Services
             }
             catch (Exception)
             {
-
                 result = new ApiResponse<bool>(false, "Error saving the selected orders.");
             }
             return result;
@@ -361,7 +360,6 @@ namespace CourierCounter.Services
         public async Task<ApiResponse<bool>> SavedCompletedOrders(WorkerOrdersViewModel data)
         {
             ApiResponse<bool> result;
-            var completionDate = DateTime.Now;
 
             var orders = await _dbContext.Orders
                 .Where(x => data.OrderId.Contains(x.Id))
@@ -392,15 +390,12 @@ namespace CourierCounter.Services
                         {
                             OrderId = orderId,
                             WorkerId = data.WorkerId,
-                            CreatedDate = completionDate
+                            CreatedDate = DateTime.UtcNow
                         };
                         _dbContext.WorkerOrder.Add(newWorkerOrder);
                     }
-                    else
-                    {
-                        _dbContext.WorkerOrder.Update(existingWorkerOrder);
-                    }
                 }
+
                 await _dbContext.SaveChangesAsync();
 
                 result = new ApiResponse<bool>(true, "Selected orders marked as completed successfully!");
@@ -412,7 +407,6 @@ namespace CourierCounter.Services
 
             return result;
         }
-
     }
 }
 

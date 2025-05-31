@@ -69,6 +69,7 @@ namespace CourierCounter.Services
                 var vehicleImagePath = SaveImage(data.VehicleRegistrationNumberImage);
                 var licenseImagePath = SaveImage(data.LicenseNumberImage);
                 var nidImagePath = SaveImage(data.NationalIdNumberImage);
+                var profileImagePath = SaveImage(data.ProfileImage);
 
                 // Map to database entity including image paths
                 Workers workerEntity = new Workers
@@ -85,6 +86,7 @@ namespace CourierCounter.Services
                     VehicleRegistrationNumberImagePath = vehicleImagePath,
                     LicenseNumberImagePath = licenseImagePath,
                     NationalIdNumberImagePath = nidImagePath,
+                    ProfileImagePath = profileImagePath,
                     Status = StatusEnum.Pending
                 };
 
@@ -123,6 +125,7 @@ namespace CourierCounter.Services
                                    LicenseNumber = worker.LicenseNumber,
                                    NationalIdNumber = worker.NationalIdNumber,
                                    VehicleRegistrationNumber = worker.VehicleRegistrationNumber,
+                                   ProfileImagePath = worker.ProfileImagePath,
                                    Status = worker.Status
                                }).ToList();
                 }
@@ -140,6 +143,7 @@ namespace CourierCounter.Services
                                    LicenseNumber = worker.LicenseNumber,
                                    NationalIdNumber = worker.NationalIdNumber,
                                    VehicleRegistrationNumber = worker.VehicleRegistrationNumber,
+                                   ProfileImagePath = worker.ProfileImagePath,
                                    Status = worker.Status
                                }).ToList();
                 }
@@ -175,6 +179,7 @@ namespace CourierCounter.Services
                                     VehicleRegistrationNumberImagePath = worker.VehicleRegistrationNumberImagePath,
                                     LicenseNumberImagePath = worker.LicenseNumberImagePath,
                                     NationalIdNumberImagePath = worker.NationalIdNumberImagePath,
+                                    ProfileImagePath = worker.ProfileImagePath,
                                     Status = worker.Status
                                 }).FirstOrDefault();
             }
@@ -206,7 +211,8 @@ namespace CourierCounter.Services
                                            VehicleRegistrationNumber = worker.VehicleRegistrationNumber,
                                            LicenseNumberImagePath = worker.LicenseNumberImagePath,
                                            NationalIdNumberImagePath = worker.NationalIdNumberImagePath,
-                                           VehicleRegistrationNumberImagePath = worker.VehicleRegistrationNumberImagePath
+                                           VehicleRegistrationNumberImagePath = worker.VehicleRegistrationNumberImagePath,
+                                           ProfileImagePath = worker.ProfileImagePath
                                            //Status = worker.Status
                                        }).FirstOrDefaultAsync();
             }

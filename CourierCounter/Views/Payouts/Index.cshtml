@@ -1,0 +1,161 @@
+﻿@model CourierCounter.Models.PayoutsViewModel
+
+@{
+    Layout = "_AdminLayout";
+}
+
+<style>
+    .clickable-row:hover {
+        background-color: #726c7222;
+    }
+
+    .action-cell {
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        padding-top: 4px;
+    }
+
+    .tick-icon {
+        color: green;
+        font-size: 1.8rem;
+        vertical-align: middle;
+    }
+
+    .mark-paid i {
+        color: green;
+        font-size: 1.4rem;
+        margin-left: 12px;
+    }
+
+    .disabled-icon {
+        pointer-events: none;
+        opacity: 0.5;
+        display: inline-block;
+        margin-left: 12px; /* Match spacing with active */
+    }
+
+    .profile-img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 1px solid #ddd;
+    }
+
+    .badge-status {
+        min-width: 70px;
+        display: inline-block;
+        text-align: center;
+        padding: 6px 12px;
+    }
+
+    .bg-pending {
+        background-color: #f8d7da !important;
+        color: #721c24 !important;
+    }
+
+    .bg-paid {
+        background-color: #d4edda !important;
+        color: #155724 !important;
+    }
+</style>
+
+<br />
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">S.N.</th>
+            <th scope="col">Profile</th>
+            <th scope="col">Worker Name</th>
+            <th scope="col">Total Wage</th>
+            <th scope="col">Paid Status</th>
+            <th scope="col">Paid Date</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.WorkerPayoutList != null && Model.WorkerPayoutList.Any())
+        {
+            int sn = 1;
+            foreach (var payout in Model.WorkerPayoutList)
+            {
+                <tr>
+                    <th scope="row">@sn</th>
+                    <td>
+                        @if (!string.IsNullOrEmpty(payout.ProfileImagePath))
+                        {
+                            <img src="@Url.Content("~/" + payout.ProfileImagePath)" alt="Profile" class="profile-img" />
+                        }
+                        else
+                        {
+                            <span>No Image</span>
+                        }
+                    </td>
+                    <td>@payout.WorkerName</td>
+                    <td>Rs. @payout.TotalWage.ToString("N2")</td>
+                    <td>
+                        @if (payout.isPaid)
+                        {
+                            <span class="badge badge-status bg-paid">Paid</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-status bg-pending">Pending</span>
+                        }
+                    </td>
+                    <td>@(payout.PaidDate.HasValue ? payout.PaidDate.Value.ToString("yyyy-MM-dd") : "-")</td>
+                    <td class="action-cell">
+                        @if (!payout.isPaid)
+                        {
+                            <a href="#" class="mark-paid" data-id="@payout.WorkerId" title="Mark as Paid">
+                                <i class="fas fa-check-circle tick-icon"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="disabled-icon" title="Already Paid">
+                                <i class="fas fa-check-circle tick-icon"></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+                sn++;
+            }
+        }
+        else
+        {
+            <tr><td colspan="7" class="text-center">No payout records found.</td></tr>
+        }
+    </tbody>
+</table>
+    
+<script>
+    $(document).ready(function () {
+        $(".mark-paid").on("click", function (e) {
+            e.preventDefault();
+            var workerId = $(this).data("id");
+                    
+            if (confirm("Mark this payout as paid?")) {
+                    $.ajax({
+                        url: '/payouts/markaspaid',
+                        type: 'POST',
+                        dataType: 'json',   
+                        data: { workerId: workerId },
+                        success: function (response) {
+                            if (response.success) {
+                                alert("Payout marked as paid.");
+                                location.reload();
+                            } else {
+                                alert(response.message || "Failed to mark as paid.");
+                            }
+                        },
+        error: function (xhr) {
+            alert("An error occurred while marking as paid.\n\n" + xhr.responseText);
+        }
+    });
+
+            }
+        });
+    });
+</script>
