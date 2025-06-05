@@ -1,7 +1,7 @@
 ﻿using CourierCounter.Models.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
+using CourierCounter.Models.Entities;
 
 namespace CourierCounter.Data
 {
