@@ -12,6 +12,9 @@ namespace CourierCounter.Models.Entities
         public required string Email { get; set; }
         public required string Password { get; set; }
         public required string ContactNumber { get; set; }
+
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         public required string HomeAddress { get; set; }
 
         public required string VehicleRegistrationNumber { get; set; }
@@ -25,5 +28,7 @@ namespace CourierCounter.Models.Entities
         public string VehicleRegistrationNumberImagePath { get; set; } = string.Empty;
         public string LicenseNumberImagePath { get; set; } = string.Empty;
         public string NationalIdNumberImagePath { get; set; } = string.Empty;
+
+        public int AssignedHubZoneId { get; set; }
     }
 }

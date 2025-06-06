@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
+using CourierCounter.Location;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,8 +39,9 @@ builder.Services.AddScoped<IMLPredictionService, MLPredictionService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IEarningService, EarningService>();
+builder.Services.AddHttpClient<INominatimGeocodingService, NominatimGeocodingService>();
 
-builder.WebHost.UseUrls("http://192.168.18.215:5183");
+builder.WebHost.UseUrls("http://192.168.102.76:5183");
 
 //inject ApplicationDbContext here after making ConnectionStrings in appsettings.json file
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

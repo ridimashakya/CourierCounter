@@ -1,7 +1,7 @@
-﻿using CourierCounter.Models.Entities;
+using CourierCounter.Models.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using CourierCounter.Models.Entities;
+using Microsoft.Identity.Client;
 
 namespace CourierCounter.Data
 {
@@ -20,6 +20,7 @@ namespace CourierCounter.Data
         public DbSet<WorkerOrders> WorkerOrder { get; set; }
         public DbSet<DailyEarning> DailyEarnings { get; set; }
         public DbSet<EarningHistory> EarningHistories { get; set; }
+        public DbSet<WageTrainingData> WageTrainingDataset { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

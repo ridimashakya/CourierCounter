@@ -10,6 +10,8 @@ namespace CourierCounter.Models.Entities
         public required string CustomerContactNumber { get; set; }
         public required string CustomerEmail { get; set; }
         public required string DeliveryAddress { get; set; }
+        public double DeliveryLatitude { get; set; }
+        public double DeliveryLongitude { get; set; }
         public DeliveryZoneEnum DeliveryZone { get; set; }
         public float DistanceInKm { get; set; } 
         public float WeightInKg { get; set; } 

@@ -1,4 +1,4 @@
-﻿using CourierCounter.Models.Entities;
+using CourierCounter.Models.Entities;
 using CourierCounter.Models;
 using CourierCounter.Services.Interfaces;
 using CourierCounter.Models.ApiModels.ApiResponse;
@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using CourierCounter.Models.ApiModels;
 using CourierCounter.Models.Enum;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using CourierCounter.Location;
 
 namespace CourierCounter.Services
 {
@@ -14,11 +15,13 @@ namespace CourierCounter.Services
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly IMLPredictionService _mlPredictionService;
+        private readonly INominatimGeocodingService _geocodingService;
 
-        public OrderServices(ApplicationDbContext dbContext, IMLPredictionService mlPredictionService)
+        public OrderServices(ApplicationDbContext dbContext, IMLPredictionService mlPredictionService, INominatimGeocodingService geocodingService)
         {
             _dbContext = dbContext;
             _mlPredictionService = mlPredictionService;
+            _geocodingService = geocodingService;
         }
         public async Task<ApiResponse<bool>> CreateOrder(OrdersViewModel data)
         {
@@ -71,60 +74,114 @@ namespace CourierCounter.Services
         public async Task<List<OrdersViewModel>> GetAllOrders()
         {
             List<OrdersViewModel> orders = new List<OrdersViewModel>();
+
             try
             {
-                orders = await (from order in _dbContext.Orders
-                                select new OrdersViewModel
-                                {
-                                    Id = order.Id,
-                                    TrackingId = order.TrackingId,
-                                    CustomerName = order.CustomerName,
-                                    CustomerEmail = order.CustomerEmail,
-                                    CustomerContactNumber = order.CustomerContactNumber,
-                                    DeliveryAddress = order.DeliveryAddress,
-                                    DeliveryZone = order.DeliveryZone,
-                                    Status = order.Status,
-                                    DistanceInKm = order.DistanceInKm,
-                                    WeightInKg = order.WeightInKg,
-                                    UrgencyLevel = order.UrgencyLevel
-                                }).ToListAsync();
-            }
-            catch (Exception)
-            {
+                var ordersList = await _dbContext.Orders.ToListAsync();
 
+                foreach (var order in ordersList)
+                {
+                    string displayAddress = order.DeliveryAddress;
+
+                    if (!string.IsNullOrWhiteSpace(order.DeliveryAddress) && order.DeliveryAddress.Contains(','))
+                    {
+                        var coords = order.DeliveryAddress.Split(',');
+
+                        if (coords.Length == 2 &&
+                            double.TryParse(coords[0].Trim(), out double lat) &&
+                            double.TryParse(coords[1].Trim(), out double lng))
+                        {
+                            try
+                            {
+                                displayAddress = await _geocodingService.ReverseGeocodeAsync(lat, lng);
+
+                                // Optional: Wait 1 sec to avoid hitting rate limits (OpenStreetMap API limit is 1 req/sec)
+                                await Task.Delay(1000);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Reverse geocoding failed for coordinates ({lat}, {lng}): {ex.Message}");
+                            }
+                        }
+                    }
+
+                    orders.Add(new OrdersViewModel
+                    {
+                        Id = order.Id,
+                        TrackingId = order.TrackingId,
+                        CustomerName = order.CustomerName,
+                        CustomerEmail = order.CustomerEmail,
+                        CustomerContactNumber = order.CustomerContactNumber,
+                        DeliveryAddress = displayAddress,
+                        DeliveryZone = order.DeliveryZone,
+                        Status = order.Status,
+                        DistanceInKm = order.DistanceInKm,
+                        WeightInKg = order.WeightInKg,
+                        UrgencyLevel = order.UrgencyLevel
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetAllOrders: {ex.Message}");
             }
 
             return orders;
         }
 
-        public OrdersViewModel? GetOrderById(int id)
+
+        public async Task<OrdersViewModel?> GetOrderById(int id)
         {
             try
             {
-                var workerName = (from workerOrder in _dbContext.WorkerOrder
-                                  join worker in _dbContext.AllWorkers on workerOrder.WorkerId equals worker.Id
-                                  where workerOrder.OrderId == id
-                                  select worker.FullName).FirstOrDefault() ?? "N/A";
+                var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.Id == id);
+                if (order == null)
+                    return null;
 
-                var orderValues = (from order in _dbContext.Orders
-                                   where order.Id == id
-                                   select new OrdersViewModel
-                                   {
-                                       Id = order.Id,
-                                       TrackingId = order.TrackingId,
-                                       CustomerName = order.CustomerName,
-                                       CustomerEmail = order.CustomerEmail,
-                                       CustomerContactNumber = order.CustomerContactNumber,
-                                       DeliveryAddress = order.DeliveryAddress,
-                                       DeliveryZone = order.DeliveryZone,
-                                       DistanceInKm = order.DistanceInKm,
-                                       WeightInKg = order.WeightInKg,
-                                       UrgencyLevel = order.UrgencyLevel,
-                                       Wage = order.Wage,
-                                       Status = order.Status,
-                                       WorkerName = workerName
-                                   }).FirstOrDefault();
-                return orderValues;
+                var workerName = (from workerOrder in _dbContext.WorkerOrder
+                                join worker in _dbContext.AllWorkers on workerOrder.WorkerId equals worker.Id
+                                where workerOrder.OrderId == id
+                                select worker.FullName).FirstOrDefault() ?? "N/A";
+
+                string displayAddress = order.DeliveryAddress;
+                
+                // If the address is in coordinate format, try to reverse geocode it
+                if (double.TryParse(order.DeliveryAddress, out _) && order.DeliveryAddress.Contains(','))
+                {
+                    try
+                    {
+                        var coords = order.DeliveryAddress.Split(',');
+                        if (coords.Length == 2 && 
+                            double.TryParse(coords[0].Trim(), out double lat) && 
+                            double.TryParse(coords[1].Trim(), out double lng))
+                        {
+                            displayAddress = await _geocodingService.ReverseGeocodeAsync(lat, lng);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // If reverse geocoding fails, keep the original coordinates
+                        Console.WriteLine($"Reverse geocoding failed: {ex.Message}");
+                    }
+                }
+
+
+                return new OrdersViewModel
+                {
+                    Id = order.Id,
+                    TrackingId = order.TrackingId,
+                    CustomerName = order.CustomerName,
+                    CustomerEmail = order.CustomerEmail,
+                    CustomerContactNumber = order.CustomerContactNumber,
+                    DeliveryAddress = displayAddress,
+                    DeliveryZone = order.DeliveryZone,
+                    DistanceInKm = order.DistanceInKm,
+                    WeightInKg = order.WeightInKg,
+                    UrgencyLevel = order.UrgencyLevel,
+                    Wage = order.Wage,
+                    Status = order.Status,
+                    WorkerName = workerName
+                };
             }
             catch (Exception ex)
             {
@@ -237,7 +294,6 @@ namespace CourierCounter.Services
 
         public async Task<ApiResponse<List<ForOrderViewModel>>> GetPendingSelectedOrders()
         {
-            //ApiResponse<List<ForOrderViewModel>> response = null;
             try
             {
                 var workers = await (from o in _dbContext.Orders
@@ -259,6 +315,8 @@ namespace CourierCounter.Services
             {
                 return new ApiResponse<List<ForOrderViewModel>>(false, "Pending selected order not listed.");
             }
+
+           
         }
 
         public async Task<ApiResponse<List<ForOrderViewModel>>> GetInProgressSelectedOrders(string userId)

@@ -1,4 +1,4 @@
-﻿using CourierCounter.Models;
+using CourierCounter.Models;
 using CourierCounter.Models.ApiModels.ApiResponse;
 using CourierCounter.Models.Entities;
 using CourierCounter.Services;
@@ -51,9 +51,13 @@ namespace CourierCounter.Controllers
         }
 
         [Route("order/details/{id}")]
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            OrdersViewModel order = _orderServices.GetOrderById(id);
+            var order = await _orderServices.GetOrderById(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
             return View(order);
         }
 
@@ -61,7 +65,11 @@ namespace CourierCounter.Controllers
         [Route("order/edit/{id}")]
         public async Task<IActionResult> UpdateOrder(int id)
         {
-            var result = _orderServices.GetOrderById(id);
+            var result = await _orderServices.GetOrderById(id);
+            if (result == null)
+            {
+                return NotFound();
+            }
             return View(result);
         }
 

@@ -1,4 +1,4 @@
-﻿using CourierCounter.Models;
+using CourierCounter.Models;
 using CourierCounter.Models.ApiModels;
 using CourierCounter.Models.ApiModels.ApiResponse;
 using CourierCounter.Models.Entities;
@@ -11,7 +11,7 @@ namespace CourierCounter.Services.Interfaces
     {
         Task<ApiResponse<bool>> CreateOrder(OrdersViewModel data);
         Task<List<OrdersViewModel>> GetAllOrders();
-        OrdersViewModel GetOrderById(int id);
+        Task<OrdersViewModel?> GetOrderById(int id);
         bool DeleteOrder(int id);
         Task<ApiResponse<bool>> UpdateOrder(int id);
         Task<ApiResponse<bool>> UpdateOrder(OrdersViewModel data);

@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.Core;
 using CourierCounter.Data;
+using CourierCounter.Location;
 using CourierCounter.Models;
 using CourierCounter.Models.ApiModels;
 using CourierCounter.Models.ApiModels.ApiResponse;
@@ -20,11 +21,13 @@ namespace CourierCounter.Services
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly INominatimGeocodingService _geoCodingService;
 
-        public WorkerServices(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
+        public WorkerServices(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, INominatimGeocodingService geoCodingService)
         {
             _dbContext = dbContext;
             _userManager = userManager;
+            _geoCodingService = geoCodingService;
         }
 
         public async Task<ApiResponse<bool>> CreateWorker([FromForm] RegistrationViewModel data)
@@ -71,6 +74,17 @@ namespace CourierCounter.Services
                 var nidImagePath = SaveImage(data.NationalIdNumberImage);
                 var profileImagePath = SaveImage(data.ProfileImage);
 
+                var geoResult = await _geoCodingService.GeocodeAddressAsync(data.HomeAddress);
+                if (geoResult == null)
+                    throw new Exception("Failed to geocode worker address");
+
+                var workerLat = geoResult.Value.lat;
+                var workerLng = geoResult.Value.lng;
+
+                var nearestHubId = HubCoordinates.Locations
+            .OrderBy(hub => GeoHelper.GetDistanceInKm(workerLat, workerLng, hub.Value.Lat, hub.Value.Lng))
+            .First().Key;
+
                 // Map to database entity including image paths
                 Workers workerEntity = new Workers
                 {
@@ -87,7 +101,10 @@ namespace CourierCounter.Services
                     LicenseNumberImagePath = licenseImagePath,
                     NationalIdNumberImagePath = nidImagePath,
                     ProfileImagePath = profileImagePath,
-                    Status = StatusEnum.Pending
+                    Status = StatusEnum.Pending,
+                    Latitude = workerLat,
+                    Longitude = workerLng,
+                    AssignedHubZoneId = nearestHubId
                 };
 
                 _dbContext.AllWorkers.Add(workerEntity);
