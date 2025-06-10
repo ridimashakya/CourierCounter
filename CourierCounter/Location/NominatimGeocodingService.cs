@@ -36,10 +36,9 @@ namespace CourierCounter.Location
             public string lon { get; set; }
         }
 
-
         public async Task<string> ReverseGeocodeAsync(double latitude, double longitude)
         {
-            var url = $"https://nominatim.openstreetmap.org/reverse?format=json&lat={latitude}&lon={longitude}&addressdetails=1&accept-language=en";
+            var url = $"https://nominatim.openstreetmap.org/reverse?format=json&lat={latitude}&lon={longitude}&addressdetails=1&accept-language=en&zoom=18";
 
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("CourierCounterApp/1.0");
 
@@ -63,7 +62,7 @@ namespace CourierCounter.Location
 
                     if (!string.IsNullOrWhiteSpace(result.address.city_district))
                         addressParts.Add(result.address.city_district);
-
+                        
                     return string.Join(", ", addressParts);
                 }
             }

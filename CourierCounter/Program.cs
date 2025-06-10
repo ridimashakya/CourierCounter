@@ -41,7 +41,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IEarningService, EarningService>();
 builder.Services.AddHttpClient<INominatimGeocodingService, NominatimGeocodingService>();
 
-builder.WebHost.UseUrls("http://192.168.102.76:5183");
+builder.WebHost.UseUrls("http://192.168.18.216:5183");
 
 //inject ApplicationDbContext here after making ConnectionStrings in appsettings.json file
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

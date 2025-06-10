@@ -17,11 +17,14 @@ namespace CourierCounter.Controllers
         }
 
         [Route("workers")]
-        public IActionResult Index(StatusEnum? status = null)
+        public async Task<IActionResult> Index(StatusEnum? status = null)
         {
-            WorkerViewModel workers = new WorkerViewModel();
-            workers.Status = status;
-            workers.WorkerList = _workerServices.GetAllWorker(status);
+            WorkerViewModel workers = new WorkerViewModel
+            {
+                Status = status,
+                WorkerList = await _workerServices.GetAllWorkerAsync(status)
+            };
+
             return View(workers);
         }
 

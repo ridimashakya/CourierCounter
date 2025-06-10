@@ -20,6 +20,8 @@ namespace CourierCounter.Models.ApiModels
 
         public string ProfileImagePath { get; set; }
 
+        public int AssignedHubZoneId { get; set; }
+
         //public StatusEnum Status { get; set; }
     }
 }

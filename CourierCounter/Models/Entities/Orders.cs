@@ -18,5 +18,6 @@ namespace CourierCounter.Models.Entities
         public UrgencyLevelEnum UrgencyLevel { get; set; } 
         public decimal Wage { get; set; }
         public OrderStatusEnum Status { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -41,9 +41,13 @@ namespace CourierCounter.Controllers.ApiController
         [Route("pendingorders")]
         [HttpGet]
         public async Task<IActionResult> PendingOrders()
-
         {
-            var result = await _orderServices.GetPendingSelectedOrders();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID not found in token");
+
+            var result = await _orderServices.GetPendingSelectedOrders(userId);
             return Ok(result);
         }
 

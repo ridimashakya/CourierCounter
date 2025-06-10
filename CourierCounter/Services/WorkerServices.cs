@@ -81,9 +81,11 @@ namespace CourierCounter.Services
                 var workerLat = geoResult.Value.lat;
                 var workerLng = geoResult.Value.lng;
 
+                var resolvedAddress = await _geoCodingService.ReverseGeocodeAsync(workerLat, workerLng);
+
                 var nearestHubId = HubCoordinates.Locations
-            .OrderBy(hub => GeoHelper.GetDistanceInKm(workerLat, workerLng, hub.Value.Lat, hub.Value.Lng))
-            .First().Key;
+                    .OrderBy(hub => GeoHelper.GetDistanceInKm(workerLat, workerLng, hub.Value.Lat, hub.Value.Lng))
+                    .First().Key;
 
                 // Map to database entity including image paths
                 Workers workerEntity = new Workers
@@ -93,7 +95,7 @@ namespace CourierCounter.Services
                     Email = data.Email,
                     Password = data.Password,
                     ContactNumber = data.ContactNumber,
-                    HomeAddress = data.HomeAddress,
+                    HomeAddress = resolvedAddress,
                     VehicleRegistrationNumber = data.VehicleRegistrationNumber,
                     LicenseNumber = data.LicenseNumber,
                     NationalIdNumber = data.NationalIdNumber,
@@ -123,54 +125,43 @@ namespace CourierCounter.Services
             return result;
         }
 
-
-        public List<Worker> GetAllWorker(StatusEnum? status = null)
+        public async Task UpdateWorkerLocationAsync(int workerId, double lat, double lon)
         {
-            List<Worker> workers = new List<Worker>();
-            try
-            {
-                if (status == null)
-                {
-                    workers = (from worker in _dbContext.AllWorkers
-                               select new Worker
-                               {
-                                   Id = worker.Id,
-                                   FullName = worker.FullName,
-                                   Email = worker.Email,
-                                   ContactNumber = worker.ContactNumber,
-                                   HomeAddress = worker.HomeAddress,
-                                   LicenseNumber = worker.LicenseNumber,
-                                   NationalIdNumber = worker.NationalIdNumber,
-                                   VehicleRegistrationNumber = worker.VehicleRegistrationNumber,
-                                   ProfileImagePath = worker.ProfileImagePath,
-                                   Status = worker.Status
-                               }).ToList();
-                }
-                else
-                {
-                    workers = (from worker in _dbContext.AllWorkers
-                               where worker.Status == status
-                               select new Worker
-                               {
-                                   Id = worker.Id,
-                                   FullName = worker.FullName,
-                                   Email = worker.Email,
-                                   ContactNumber = worker.ContactNumber,
-                                   HomeAddress = worker.HomeAddress,
-                                   LicenseNumber = worker.LicenseNumber,
-                                   NationalIdNumber = worker.NationalIdNumber,
-                                   VehicleRegistrationNumber = worker.VehicleRegistrationNumber,
-                                   ProfileImagePath = worker.ProfileImagePath,
-                                   Status = worker.Status
-                               }).ToList();
-                }
+            var worker = await _dbContext.AllWorkers.FindAsync(workerId);
+            if (worker == null) throw new Exception("Worker not found");
 
-            }
-            catch (Exception ex)
-            {
-                //log exception
-            }
+            worker.Latitude = lat;
+            worker.Longitude = lon;
 
+            worker.HomeAddress = await _geoCodingService.ReverseGeocodeAsync(lat, lon);
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<Worker>> GetAllWorkerAsync(StatusEnum? status = null)
+        {
+            var query = _dbContext.AllWorkers.AsQueryable();
+
+            if (status != null)
+                query = query.Where(w => w.Status == status);
+
+            var workers = await query
+                .Select(w => new Worker
+                {
+                    Id = w.Id,
+                    FullName = w.FullName,
+                    Email = w.Email,
+                    ContactNumber = w.ContactNumber,
+                    Latitude = w.Latitude,
+                    Longitude = w.Longitude,
+                    LicenseNumber = w.LicenseNumber,
+                    NationalIdNumber = w.NationalIdNumber,
+                    VehicleRegistrationNumber = w.VehicleRegistrationNumber,
+                    ProfileImagePath = w.ProfileImagePath,
+                    Status = w.Status,
+                    HomeAddress = w.HomeAddress 
+                })
+                .ToListAsync();
 
             return workers;
         }
@@ -197,12 +188,13 @@ namespace CourierCounter.Services
                                     LicenseNumberImagePath = worker.LicenseNumberImagePath,
                                     NationalIdNumberImagePath = worker.NationalIdNumberImagePath,
                                     ProfileImagePath = worker.ProfileImagePath,
-                                    Status = worker.Status
+                                    Status = worker.Status,
+                                    AssignedHubZoneId = worker.AssignedHubZoneId
                                 }).FirstOrDefault();
             }
             catch (Exception ex)
             {
-                //log exception
+
             }
 
             return workerValues;

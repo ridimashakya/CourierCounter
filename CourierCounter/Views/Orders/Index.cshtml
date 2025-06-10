@@ -49,9 +49,20 @@
                             <a href="/Order/Details/@order.Id" class="text-dark me-2" style="text-decoration: none !important">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="/Order/Edit/@order.Id" class="text-dark me-2 update-order" style="text-decoration: none !important">
-                                <i class="fas fa-edit"></i>
-                            </a>
+
+                            @if (order.Status != OrderStatusEnum.InProgress && order.Status != OrderStatusEnum.Delivered)
+                            {
+                                <a href="/Order/Edit/@order.Id" class="text-dark me-2 update-order" style="text-decoration: none !important">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted me-2" title="Update disabled for this status">
+                                    <i class="fas fa-edit" style="opacity: 0.5; cursor: not-allowed;"></i>
+                                </span>
+                            }
+
                             <a class="text-dark delete-order" id="order" data-id="@order.Id">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
@@ -61,7 +72,6 @@
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine(":::: " + ex.ToString());
             }
         }
@@ -78,7 +88,7 @@
     $(".update-order").on("click", function(e){
         e.stopPropagation();
         var url = $(this).data("url");
-        if(url) 
+        if(url)
             window.location.href= url;
     });
 
@@ -90,7 +100,7 @@
             $.ajax({
                 url: '/order/delete/' + orderId,
                 type: 'DELETE',
-                data: {id: orderId},    
+                data: {id: orderId},
                 success: function (response) {
                     if(response){
                         alert("Order deleted successfully.");
@@ -107,4 +117,3 @@
         }
     });
 </script>
-

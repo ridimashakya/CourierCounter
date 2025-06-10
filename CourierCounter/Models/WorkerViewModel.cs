@@ -28,6 +28,14 @@ namespace CourierCounter.Models
         public string ProfileImagePath { get; set; } = string.Empty;
 
         public StatusEnum Status { get; set; }
+
+        public int AssignedHubZoneId { get; set; }
+
+        [NotMapped]
+        public double? Latitude { get; set; }
+
+        [NotMapped]
+        public double? Longitude { get; set; }
     }
 }
 

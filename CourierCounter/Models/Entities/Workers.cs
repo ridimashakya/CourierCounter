@@ -1,4 +1,4 @@
-﻿using CourierCounter.Models.Enum;
+using CourierCounter.Models.Enum;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CourierCounter.Models.Entities

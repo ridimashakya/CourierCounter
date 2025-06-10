@@ -51,13 +51,9 @@ namespace CourierCounter.Controllers
         }
 
         [Route("order/details/{id}")]
-        public async Task<IActionResult> Details(int id)
+        public IActionResult Details(int id)
         {
-            var order = await _orderServices.GetOrderById(id);
-            if (order == null)
-            {
-                return NotFound();
-            }
+            OrdersViewModel order = _orderServices.GetOrderById(id);
             return View(order);
         }
 
@@ -65,11 +61,7 @@ namespace CourierCounter.Controllers
         [Route("order/edit/{id}")]
         public async Task<IActionResult> UpdateOrder(int id)
         {
-            var result = await _orderServices.GetOrderById(id);
-            if (result == null)
-            {
-                return NotFound();
-            }
+            var result = _orderServices.GetOrderById(id);
             return View(result);
         }
 
