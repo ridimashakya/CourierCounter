@@ -38,13 +38,24 @@ namespace CourierCounter.Services
 
                 var wage = _mlPredictionService.PredictWage(model);
 
+                var geoResult = await _geocodingService.GeocodeAddressAsync(data.DeliveryAddress);
+                if (geoResult == null)
+                    throw new Exception("Failed to geocode the order address");
+
+                var orderLat = geoResult.Value.lat;
+                var orderLng = geoResult.Value.lng;
+
+                var resolvedAddress = await _geocodingService.ReverseGeocodeAsync(orderLat, orderLng);
+
                 Orders orderEntity = new Orders
                 {
                     CustomerName = data.CustomerName,
                     CustomerEmail = data.CustomerEmail,
                     CustomerContactNumber = data.CustomerContactNumber,
                     //TrackingId = trackingId,
-                    DeliveryAddress = data.DeliveryAddress,
+                    DeliveryAddress = resolvedAddress,
+                    DeliveryLatitude = orderLat,
+                    DeliveryLongitude = orderLng,
                     DeliveryZone = data.DeliveryZone,
                     DistanceInKm = data.DistanceInKm,
                     WeightInKg = data.WeightInKg,
@@ -126,7 +137,6 @@ namespace CourierCounter.Services
             return orders;
         }
 
-
         public OrdersViewModel? GetOrderById(int id)
         {
             try
@@ -183,39 +193,6 @@ namespace CourierCounter.Services
             }
         }
 
-        //public async Task<ApiResponse<bool>> UpdateOrder(int id)
-        //{
-        //    ApiResponse<bool> result;
-        //    try
-        //    {
-        //        var existingOrderValue = (from order in _dbContext.Orders
-        //                                  where order.Id == id
-        //                                  select new OrdersViewModel
-        //                                  {
-        //                                      Id = order.Id,
-        //                                      TrackingId = order.TrackingId,
-        //                                      CustomerName = order.CustomerName,
-        //                                      CustomerEmail = order.CustomerEmail,
-        //                                      CustomerContactNumber = order.CustomerContactNumber,
-        //                                      DeliveryAddress = order.DeliveryAddress,
-        //                                      DeliveryZone = order.DeliveryZone,
-        //                                      DistanceInKm = order.DistanceInKm,
-        //                                      WeightInKg = order.WeightInKg,
-        //                                      UrgencyLevel = order.UrgencyLevel,
-        //                                      Wage = order.Wage,
-        //                                      Status = order.Status
-        //                                  }).FirstOrDefault();
-
-        //        await _dbContext.SaveChangesAsync();
-        //        result = new ApiResponse<bool>(true, "Order details listed successfully!");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        result = new ApiResponse<bool>(false, "Order details cannot be listed");
-        //    }
-        //    return result;
-        //}
-
         public async Task<ApiResponse<bool>> UpdateOrder(OrdersViewModel data)
         {
             ApiResponse<bool> result;
@@ -267,129 +244,98 @@ namespace CourierCounter.Services
 
         public async Task<ApiResponse<List<ForOrderViewModel>>> GetPendingSelectedOrders(string userId)
         {
-            try
-            {
-                var workers = await (from o in _dbContext.Orders
-                                     where !_dbContext.WorkerOrder.Any(wo => wo.OrderId == o.Id)
-                                     select new ForOrderViewModel
-                                     {
-                                         DeliveryAddress = o.DeliveryAddress,
-                                         TrackingId = o.TrackingId,
-                                         DistanceInKm = o.DistanceInKm,
-                                         WeightInKg = o.WeightInKg,
-                                         UrgencyLevel = o.UrgencyLevel.ToString(),
-                                         Wage = o.Wage
-                                     }).ToListAsync();
-
-
-                return new ApiResponse<List<ForOrderViewModel>>(true, "Pending selected order listing successfull!", workers);
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponse<List<ForOrderViewModel>>(false, "Pending selected order not listed.");
-            }
-
             //try
             //{
-            //    if (string.IsNullOrEmpty(userId))
-            //    {
-            //        return new ApiResponse<List<ForOrderViewModel>>(false, "User ID is required.");
-            //    }
+            //    var workers = await (from o in _dbContext.Orders
+            //                         where !_dbContext.WorkerOrder.Any(wo => wo.OrderId == o.Id)
+            //                         select new ForOrderViewModel
+            //                         {
+            //                             DeliveryAddress = o.DeliveryAddress,
+            //                             TrackingId = o.TrackingId,
+            //                             DistanceInKm = o.DistanceInKm,
+            //                             WeightInKg = o.WeightInKg,
+            //                             UrgencyLevel = o.UrgencyLevel.ToString(),
+            //                             Wage = o.Wage
+            //                         }).ToListAsync();
 
-            //    var worker = await _dbContext.AllWorkers
-            //        .Where(w => w.UserId == userId)
-            //        .Select(w => new { w.Longitude, w.Latitude })
-            //        .FirstOrDefaultAsync();
 
-            //    if (worker == null)
-            //        return new ApiResponse<List<ForOrderViewModel>>(false, "Worker not found.");
-
-            //    var currentTime = DateTime.UtcNow;
-            //    var visibleOrder = new List<ForOrderViewModel>();
-
-            //    var pendingOrders = await _dbContext.Orders
-            //        .Where(o => !_dbContext.WorkerOrder.Any(wo => wo.OrderId == o.Id))
-            //        .ToListAsync();
-
-            //    foreach(var order in pendingOrders)
-            //    {
-            //        double distance = GeoHelper.GetDistanceInKm(
-            //            worker.Latitude,
-            //            worker.Longitude,
-
-            //        )
-            //    }
-
-            //}
-            //catch (Exception)
-            //{
-
-            //    throw;
-            //}
-
-            //try
-            //{
-            //    if (string.IsNullOrEmpty(userId))
-            //    {
-            //        return new ApiResponse<List<ForOrderViewModel>>(false, "User ID is required");
-            //    }
-
-            //    var worker = await _dbContext.AllWorkers
-            //        .Where(w => w.UserId == userId)
-            //        .Select(w => new { w.Latitude, w.Longitude })
-            //        .FirstOrDefaultAsync();
-
-            //    if (worker == null)
-            //        return new ApiResponse<List<ForOrderViewModel>>(false, "Worker not found");
-
-            //    var currentTime = DateTime.UtcNow;
-            //    var visibleOrders = new List<ForOrderViewModel>();
-
-            //    var pendingOrders = await _dbContext.Orders
-            //        .Where(o => !_dbContext.WorkerOrder.Any(wo => wo.OrderId == o.Id))
-            //        .ToListAsync();
-
-            //    foreach (var order in pendingOrders)
-            //    {
-            //        double distance = GeoHelper.GetDistanceInKm(
-            //            worker.Latitude,
-            //            worker.Longitude,
-            //            order.DeliveryLatitude,
-            //            order.DeliveryLongitude
-            //        );
-
-            //        var timeSinceCreation = currentTime - order.CreatedAt;
-
-            //        bool isVisible = distance switch
-            //        {
-            //            <= 2 => true, 
-            //            <= 5 when timeSinceCreation.TotalMinutes >= 10 => true, 
-            //            <= 10 when timeSinceCreation.TotalMinutes >= 20 => true, 
-            //            _ => false 
-            //        };
-
-            //        if (isVisible)
-            //        {
-            //            visibleOrders.Add(new ForOrderViewModel
-            //            {
-            //                DeliveryAddress = order.DeliveryAddress,
-            //                TrackingId = order.TrackingId,
-            //                DistanceInKm = (float)distance,
-            //                WeightInKg = order.WeightInKg,
-            //                UrgencyLevel = order.UrgencyLevel.ToString(),
-            //                Wage = order.Wage
-            //            });
-            //        }
-            //    }
-
-            //    return new ApiResponse<List<ForOrderViewModel>>(true, "Pending orders retrieved successfully", visibleOrders);
+            //    return new ApiResponse<List<ForOrderViewModel>>(true, "Pending selected order listing successfull!", workers);
             //}
             //catch (Exception ex)
             //{
-            //    return new ApiResponse<List<ForOrderViewModel>>(false, "Error retrieving pending orders");
+            //    return new ApiResponse<List<ForOrderViewModel>>(false, "Pending selected order not listed.");
             //}
 
+            try
+            {
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return new ApiResponse<List<ForOrderViewModel>>(false, "User ID is required");
+                }
+
+                var worker = await _dbContext.AllWorkers
+                    .FirstOrDefaultAsync(w => w.UserId == userId);
+
+                if (worker == null)
+                    return new ApiResponse<List<ForOrderViewModel>>(false, "Worker not found");
+
+                if (worker.AssignedHubZoneId == null)
+                    return new ApiResponse<List<ForOrderViewModel>>(false, "Worker is not assigned to any hub");
+
+                var currentTime = DateTime.UtcNow;
+                var visibleOrders = new List<ForOrderViewModel>();
+
+                var pendingOrders = await _dbContext.Orders
+                    .Where(o => o.Status == OrderStatusEnum.Pending &&
+                    !_dbContext.WorkerOrder.Any(wo => wo.OrderId == o.Id) &&
+                    (int)o.DeliveryZone == worker.AssignedHubZoneId)
+                .ToListAsync();
+
+                foreach (var order in pendingOrders)
+                {
+                    double distance = GeoHelper.GetDistanceInKm(
+                        worker.Latitude,
+                        worker.Longitude,
+                        order.DeliveryLatitude,
+                        order.DeliveryLongitude
+                    );
+
+                    var timeSinceCreation = currentTime - order.CreatedAt;
+
+                    bool isVisible = distance switch
+                    {
+                        <= 2 => true,
+                        <= 5 when timeSinceCreation.TotalMinutes >= 10 => true,
+                        <= 10 when timeSinceCreation.TotalMinutes >= 20 => true,
+                        _ => false
+                    };
+
+                    if (isVisible)
+                    {
+                        visibleOrders.Add(new ForOrderViewModel
+                        {
+                            DeliveryAddress = order.DeliveryAddress,
+                            TrackingId = order.TrackingId,
+                            DistanceInKm = (float)distance,
+                            WeightInKg = order.WeightInKg,
+                            UrgencyLevel = order.UrgencyLevel.ToString(),
+                            Wage = order.Wage
+                        });
+                    }
+                }
+
+                var sortedVisibleOrders = visibleOrders
+                    .OrderBy(o => o.DistanceInKm)
+                    .ToList();
+
+                return new ApiResponse<List<ForOrderViewModel>>(true, "Pending orders retrieved successfully", sortedVisibleOrders);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<List<ForOrderViewModel>>(false, "Error retrieving pending orders");
+            }
         }
+
 
         public async Task<ApiResponse<List<ForOrderViewModel>>> GetInProgressSelectedOrders(string userId)
         {

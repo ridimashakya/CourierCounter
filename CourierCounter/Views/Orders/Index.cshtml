@@ -55,17 +55,22 @@
                                 <a href="/Order/Edit/@order.Id" class="text-dark me-2 update-order" style="text-decoration: none !important">
                                     <i class="fas fa-edit"></i>
                                 </a>
+
+                                <a class="text-dark delete-order" id="order" data-id="@order.Id">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
                             }
                             else
                             {
                                 <span class="text-muted me-2" title="Update disabled for this status">
                                     <i class="fas fa-edit" style="opacity: 0.5; cursor: not-allowed;"></i>
                                 </span>
+
+                                <span class="text-muted me-2" title="Update disabled for this status">
+                                    <i class="fas fa-trash-alt" style="opacity: 0.5; cursor: not-allowed;"></i>
+                                </span>
                             }
 
-                            <a class="text-dark delete-order" id="order" data-id="@order.Id">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
                         </td>
                     </tr>
                 }

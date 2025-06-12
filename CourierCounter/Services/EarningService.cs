@@ -238,7 +238,7 @@ namespace CourierCounter.Services
             var dailyEarning = await _dbContext.DailyEarnings
                 .FirstOrDefaultAsync(de => de.WorkerId == worker.Id);
 
-            // Archive previous day earnings if dailyEarning is from an earlier date
+            // Archive and DELETE yesterday’s earning
             if (dailyEarning != null && dailyEarning.CreatedDate.Date < today)
             {
                 if (dailyEarning.TotalWage > 0)
@@ -254,8 +254,12 @@ namespace CourierCounter.Services
                 }
 
                 // Reset daily earning for today
-                dailyEarning.TotalWage = 0;
-                dailyEarning.CreatedDate = today;
+                //dailyEarning.TotalWage = 0;
+                //dailyEarning.CreatedDate = today;
+                //dailyEarning.isPaid = false;
+                //dailyEarning.PaidDate = null;
+
+                _dbContext.DailyEarnings.Remove(dailyEarning);
 
                 await _dbContext.SaveChangesAsync();
             }
@@ -297,8 +301,11 @@ namespace CourierCounter.Services
                 {
                     WorkerId = worker.Id,
                     CreatedDate = today,
-                    TotalWage = totalWage
+                    TotalWage = totalWage,
+                    isPaid = false,
+                    PaidDate = null
                 };
+
                 _dbContext.DailyEarnings.Add(dailyEarning);
             }
             else
